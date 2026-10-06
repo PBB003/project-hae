@@ -6,10 +6,15 @@ cadenas o comentarios. Si tree-sitter no está instalado, `AVAILABLE` es False y
 scanner.py usa el método de regex como respaldo.
 """
 import re
+import importlib.metadata
 from pathlib import PurePosixPath
 from typing import Any, Dict, List, Optional, Tuple
 
 try:
+    # 0.26.0 produjo access violations durante GC en escaneos reales Windows.
+    # No cargar esa extensión nativa en un entorno que todavía no se actualizó.
+    if importlib.metadata.version("tree-sitter") != "0.25.2":
+        raise RuntimeError("Se requiere tree-sitter==0.25.2; actualiza client/requirements.txt")
     import tree_sitter_typescript as _tst
     from tree_sitter import Language, Parser
 
@@ -18,9 +23,12 @@ try:
         "ts": Language(_tst.language_typescript()),
     }
     AVAILABLE = True
-except Exception:  # pragma: no cover - depende del entorno
+except Exception as exc:  # pragma: no cover - depende del entorno
     _LANGS = {}
     AVAILABLE = False
+    INIT_ERROR = str(exc)
+else:
+    INIT_ERROR = ""
 
 _parsers: Dict[str, Any] = {}
 _JSX_TYPES = {"jsx_element", "jsx_self_closing_element", "jsx_fragment"}
@@ -93,7 +101,8 @@ def _clean_type_text(raw: str) -> str:
     # caracteres dentro de literales (URLs, "/*...*/", "a; b") son datos.
     prefix = b"type __HAEProps = "
     source = raw.encode("utf-8")
-    root = _parser_for(".ts").parse(prefix + source).root_node
+    tree = _parser_for(".ts").parse(prefix + source)
+    root = tree.root_node
     edits = []
     stack = [root]
     while stack:
@@ -150,7 +159,8 @@ def _signature(name: str, fn) -> str:
 
 def extract(content: str, ext: str, rel_path: str, is_ui_file: bool,
             is_util_folder: bool, include_contracts: bool = False) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
-    root = _parser_for(ext).parse(content.encode("utf-8")).root_node
+    tree = _parser_for(ext).parse(content.encode("utf-8"))
+    root = tree.root_node
 
     types: Dict[str, str] = {}
     decls: Dict[str, Dict[str, Any]] = {}
@@ -329,14 +339,30 @@ def extract(content: str, ext: str, rel_path: str, is_ui_file: bool,
             body = fn.child_by_field_name("body")
             signature = fn.text[:body.start_byte-fn.start_byte].decode("utf-8").strip() if body else _txt(fn)
             referenced = {name for name in generics if name in types}
+            required_types, bound_types = set(), set()
             stack = [type_ann] + [fn.child_by_field_name(field) for field in ("parameters", "return_type", "type_parameters")]
+            generic_trees = [_parser_for('.ts').parse(('type __HAE_GENERIC__ = '+generic+';').encode()) for generic in generics]
+            stack.extend(tree.root_node for tree in generic_trees)
             while stack:
                 current = stack.pop()
                 if current is None:
                     continue
+                if current.type == 'type_parameter':
+                    parameter_name = current.child_by_field_name('name')
+                    if parameter_name is not None:
+                        bound_types.add(_txt(parameter_name))
+                if current.type == 'nested_type_identifier':
+                    required_types.add(_txt(current))
+                    continue
+                if current.type == 'type_query':
+                    required_types.add(_txt(current))
+                    continue
+                if current.type == 'type_identifier':
+                    required_types.add(_txt(current))
                 if current.type == "type_identifier" and _txt(current) in types:
                     referenced.add(_txt(current))
                 stack.extend(current.children)
             item["contract"] = "\n".join(decorators + [signature] + ([_txt(type_ann)] if type_ann else []) + [f"{name} = {types[name]}" for name in sorted(referenced)])
+            item['referenced_types'] = sorted(required_types - bound_types - {'__HAE_GENERIC__'})
 
     return components, utilities

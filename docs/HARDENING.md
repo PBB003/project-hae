@@ -15,7 +15,11 @@ Para varios repositorios, declara rutas relativas dentro del workspace, con IDs 
 ]
 ```
 
-Cada `(project_id, repo_id, branch)` conserva su catálogo actual. Git aporta rama, commit y indicador de cambios locales; sin Git, el commit queda desconocido. La búsqueda devuelve origen, líneas, fecha y revisión. Verifica la fuente antes de reutilizar un símbolo; los contratos importados desde otro archivo no se resuelven.
+Cada `(project_id, repo_id, branch)` conserva su catálogo actual. Git aporta rama, commit y indicador de cambios locales; sin Git, el commit queda desconocido. La búsqueda devuelve origen, líneas, fecha y revisión. Verifica la fuente antes de reutilizar un símbolo. El scanner resuelve referencias locales de tipos por imports, aliases y reexportaciones; publica pendientes si encuentra dependencias externas o construcciones no soportadas. No sustituye al compilador TypeScript.
+
+Los contratos y sus dependencias se sincronizan juntos. La migración añade campos sin borrar registros; los clientes antiguos quedan marcados como `not_scanned` en resolución de tipos. Tipos privados necesarios se indexan con `exported=false`, para poder recuperar omisiones sin sugerir que se pueden importar directamente.
+
+Los validadores MCP son hashes del contenido, alcance, identidad y presupuesto. No hay una caché global de respuestas ni se salta la autorización. Se recalculan con la lectura actual del catálogo, sus manifiestos y su vigencia; un cambio de revisión, contrato, dependencia o caducidad invalida el validador correspondiente. Los cambios de fuente sin sincronizar no pueden detectarse desde el servidor remoto. Los presupuestos usan bytes UTF-8 del JSON como cota superior conservadora para tokenizadores BPE de bytes, sin vocabularios descargados ni equivalencia con facturación; las omisiones se señalan y no cortan contratos.
 
 `POST /api/sync` admite:
 
@@ -86,3 +90,9 @@ El administrador puede consultar `GET /api/projects/{id}/webhook-events` y reint
 5. Si falla, detener HAE 2 y restaurar conjuntamente código, dependencias, DB y configuración anteriores. No ejecutar código anterior contra la base migrada como mecanismo de rollback.
 
 No mover el catálogo de Tekniek a Project HAE. El proyecto antiguo `mi-proyecto-react` conserva sus registros históricos como referencia; no representa el catálogo de este workspace.
+
+## Estabilidad del parser en Windows
+
+El 6 de octubre de 2026, un escaneo real de Tekniek con `tree-sitter==0.26.0` cerró `python.exe` con una violación de acceso durante la recolección de memoria. El mismo escaneo completó 1.324 archivos con `0.25.2`. Se fija esta versión en los requisitos del cliente, el paquete y el lock de pruebas; el parser rechaza cargar otras versiones nativas y expone `INIT_ERROR`. No es una afirmación sobre todos los entornos de la biblioteca.
+
+La prueba `tests/test_parser_stability.py` ejecuta 1.200 extracciones en un subproceso con GC forzado. El fallo sintáctico independiente de `src/app/layout.tsx` en Tekniek mantiene ese escaneo frontend como incompleto: no autoriza un snapshot que elimine omisiones.

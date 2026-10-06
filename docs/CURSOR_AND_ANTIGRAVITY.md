@@ -22,6 +22,8 @@ Usa [AGENTS.md](../AGENTS.md) como referencia. Para otro proyecto, cambia `proje
 6. Ejecutar comprobaciones de reglas y pruebas pertinentes; registrar evidencia y pendientes.
 7. Guardar sesión con metadatos de continuidad antes de cerrar el hito.
 
+Para símbolos conocidos, `hae_get_symbol` filtra por nombre/archivo sin ranking. Leer directamente funciones pequeñas conocidas puede ahorrar más. Revisar omisiones y pendientes de tipos; ampliar el presupuesto cuando haga falta. Guardar `etag` junto al contenido y enviar `if_none_match` únicamente mientras ese contenido siga disponible. Usar `include_types=False` en nivel contrato para tipos ya conocidos. Detalles en [niveles y opciones de respuesta](SEARCH_RESPONSES.md).
+
 ## Actualizar el índice
 
 ```powershell
@@ -32,4 +34,4 @@ hae check
 
 La CLI conserva archivos de instrucciones ya existentes; detecta identidad incorrecta en AGENTS en lugar de sustituir silenciosamente sus reglas. Los hooks `post-merge` nuevos invocan `hae` desde PATH y conservan hooks personalizados existentes. Si un hook antiguo contiene rutas de otra máquina, sustituirlo explícitamente por un hook local apropiado.
 
-El índice compacto reduce lecturas repetidas en ciertos flujos. El tamaño real del contexto y el ahorro dependen del proyecto y la tarea; no hay porcentajes medidos en esta versión.
+El índice compacto reduce lecturas repetidas en ciertos flujos. El tamaño real del contexto y el ahorro dependen del proyecto y la tarea; [los benchmarks](../benchmarks/ADVANCED_REPORT.md) separan lectura inicial, mayor cobertura de tipos y reutilización. No miden productividad ni calidad al programar.

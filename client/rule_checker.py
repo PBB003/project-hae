@@ -6,7 +6,7 @@ from pathlib import Path
 
 
 KINDS = {"forbidden_pattern", "forbidden_import", "required_file", "max_file_lines"}
-IGNORED = {"node_modules", ".git", ".venv", ".venv-test", "dist", "build", "__pycache__", ".hae-backups"}
+IGNORED = {"node_modules", ".git", ".venv", ".venv-test", "dist", "build", "__pycache__", ".hae-backups", "tmp_pytest"}
 
 
 def validate_check_spec(spec):
@@ -83,8 +83,8 @@ def check_rules(root_dir, rules):
                     continue
                 if not ast_parser.AVAILABLE:
                     raise ValueError("forbidden_import requiere tree-sitter")
-                tree = ast_parser._parser_for(path.suffix).parse(content.encode()).root_node
-                for node in tree.named_children:
+                tree = ast_parser._parser_for(path.suffix).parse(content.encode())
+                for node in tree.root_node.named_children:
                     if node.type not in ("import_statement", "export_statement"):
                         continue
                     source = node.child_by_field_name("source")

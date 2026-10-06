@@ -1,0 +1,2 @@
+# Opcional, utilizado solo para medir; no es una dependencia del servidor.
+tiktoken==0.14.0

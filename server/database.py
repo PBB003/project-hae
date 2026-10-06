@@ -137,9 +137,13 @@ async def init_db():
         # repositorios/ramas sin depender del orden de despliegue del cliente.
         additions = {
             "components": {"repo_id": "TEXT NOT NULL DEFAULT 'legacy'", "branch": "TEXT NOT NULL DEFAULT ''",
-                           "source_line": "INTEGER", "source_end_line": "INTEGER", "contract": "TEXT"},
+                           "source_line": "INTEGER", "source_end_line": "INTEGER", "contract": "TEXT",
+                           "type_dependencies": "TEXT NOT NULL DEFAULT '[]'", "unresolved_types": "TEXT NOT NULL DEFAULT '[]'",
+                           "type_resolution": "TEXT NOT NULL DEFAULT 'not_scanned'", "exported": "INTEGER"},
             "utilities": {"repo_id": "TEXT NOT NULL DEFAULT 'legacy'", "branch": "TEXT NOT NULL DEFAULT ''",
-                          "source_line": "INTEGER", "source_end_line": "INTEGER", "contract": "TEXT"},
+                          "source_line": "INTEGER", "source_end_line": "INTEGER", "contract": "TEXT",
+                          "type_dependencies": "TEXT NOT NULL DEFAULT '[]'", "unresolved_types": "TEXT NOT NULL DEFAULT '[]'",
+                          "type_resolution": "TEXT NOT NULL DEFAULT 'not_scanned'", "exported": "INTEGER"},
             "session_logs": {"repo_id": "TEXT DEFAULT ''", "branch": "TEXT DEFAULT ''", "commit_sha": "TEXT DEFAULT ''",
                              "ticket_id": "TEXT DEFAULT ''", "agent": "TEXT DEFAULT ''", "evidence": "TEXT", "actor": "TEXT DEFAULT 'legacy'"},
             "meeting_notes": {"source_id": "TEXT", "updated_at": "TEXT"},

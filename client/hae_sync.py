@@ -348,9 +348,10 @@ def main():
             except urllib.error.HTTPError as exc:
                 if exc.code != 404: raise
                 catalog = []
+            parser_status = __import__('client.ast_parser',fromlist=['AVAILABLE','INIT_ERROR'])
             print(json.dumps({"project_id":config['project']['id'],"repositories":[repo for repo,_ in repositories],
                               "server":health,"catalog":catalog,"supported_sources":["TS","TSX","JS","JSX"],
-                              "ast":__import__('client.ast_parser',fromlist=['AVAILABLE']).AVAILABLE},ensure_ascii=False,indent=2))
+                              "ast":parser_status.AVAILABLE,"ast_error":parser_status.INIT_ERROR},ensure_ascii=False,indent=2))
         except (ValueError,urllib.error.URLError) as exc:
             print(f"[Error] Doctor: {exc}")
             sys.exit(1)

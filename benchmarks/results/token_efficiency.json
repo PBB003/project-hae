@@ -1,0 +1,262 @@
+{
+  "measured_at_utc": "2026-10-06T13:29:09.302151+00:00",
+  "tiktoken_version": "0.14.0",
+  "scope": "Recuperación de interfaces de 7 símbolos preseleccionados de archivos reales de Tekniek",
+  "method": "Textos de argumentos/respuestas MCP, contexto inicial una vez, fuente completa o declaración dirigida; sin generación de código ni facturación",
+  "scan": {
+    "frontend": {
+      "components": 321,
+      "utilities": 1412,
+      "engine": "tree-sitter",
+      "errors": [
+        {
+          "path": "src/app/layout.tsx",
+          "reason": "Sintaxis no reconocida por AST"
+        }
+      ],
+      "scanned_files": 602
+    },
+    "backend": {
+      "components": 0,
+      "utilities": 3047,
+      "engine": "tree-sitter",
+      "errors": [],
+      "scanned_files": 722
+    }
+  },
+  "cases": [
+    {
+      "case": "Checkbox",
+      "symbol": "Checkbox",
+      "repo_id": "frontend",
+      "file": "src/components/form/input/Checkbox.tsx",
+      "sha256": "e2ab847970cc6b6a238bea5ba447df63e74cdf6a5c2b32f7b03baae391a3f39a",
+      "extra_source_files": [],
+      "extra_source_sha256": {},
+      "tokens": {
+        "o200k_base": {
+          "full_files": 462,
+          "directed_source": 88,
+          "hae_lookup_and_imported_contracts": 453,
+          "hae_lookup_and_source_verification": 541,
+          "lookup_saving_vs_full_percent": 1.95,
+          "verified_saving_vs_full_percent": -17.1
+        },
+        "cl100k_base": {
+          "full_files": 448,
+          "directed_source": 84,
+          "hae_lookup_and_imported_contracts": 452,
+          "hae_lookup_and_source_verification": 536,
+          "lookup_saving_vs_full_percent": -0.89,
+          "verified_saving_vs_full_percent": -19.64
+        }
+      }
+    },
+    {
+      "case": "Crear proyecto: frontend",
+      "symbol": "createProject",
+      "repo_id": "frontend",
+      "file": "src/infrastructure/services/OperationsService.ts",
+      "sha256": "4a727b3bca3245e559e109ff51adcb547ec05318bb5ac074e9d836a97559eedb",
+      "extra_source_files": [
+        "src/application/dtos/OperationsDTO.ts"
+      ],
+      "extra_source_sha256": {
+        "src/application/dtos/OperationsDTO.ts": "f67f17e608107e1af1d6396198c8d9a730caf49ef73b43f2ba50082bc1e37424"
+      },
+      "tokens": {
+        "o200k_base": {
+          "full_files": 4706,
+          "directed_source": 1281,
+          "hae_lookup_and_imported_contracts": 1602,
+          "hae_lookup_and_source_verification": 1630,
+          "lookup_saving_vs_full_percent": 65.96,
+          "verified_saving_vs_full_percent": 65.36
+        },
+        "cl100k_base": {
+          "full_files": 4597,
+          "directed_source": 1243,
+          "hae_lookup_and_imported_contracts": 1574,
+          "hae_lookup_and_source_verification": 1603,
+          "lookup_saving_vs_full_percent": 65.76,
+          "verified_saving_vs_full_percent": 65.13
+        }
+      }
+    },
+    {
+      "case": "Crear proyecto: backend",
+      "symbol": "ProjectService.createProject",
+      "repo_id": "backend",
+      "file": "src/operations/domain/services/project.service.ts",
+      "sha256": "89c605c6f1f3b61335a2e0c7a98b320414197d284b7d1a2c2dcab1ce82484c85",
+      "extra_source_files": [
+        "src/operations/ports/inbound/manage-projects.port.ts"
+      ],
+      "extra_source_sha256": {
+        "src/operations/ports/inbound/manage-projects.port.ts": "01c111c3dfa93cf7e5bb8f37d6c584f8a3845a9f8e73677ab0429634c80233a8"
+      },
+      "tokens": {
+        "o200k_base": {
+          "full_files": 2074,
+          "directed_source": 386,
+          "hae_lookup_and_imported_contracts": 704,
+          "hae_lookup_and_source_verification": 727,
+          "lookup_saving_vs_full_percent": 66.06,
+          "verified_saving_vs_full_percent": 64.95
+        },
+        "cl100k_base": {
+          "full_files": 2028,
+          "directed_source": 382,
+          "hae_lookup_and_imported_contracts": 708,
+          "hae_lookup_and_source_verification": 731,
+          "lookup_saving_vs_full_percent": 65.09,
+          "verified_saving_vs_full_percent": 63.95
+        }
+      }
+    },
+    {
+      "case": "useModal",
+      "symbol": "useModal",
+      "repo_id": "frontend",
+      "file": "src/hooks/useModal.ts",
+      "sha256": "50c64e1334bbf10f9ac895c3f3168ff9358d8605391d6cc0af26f6f02f577baf",
+      "extra_source_files": [],
+      "extra_source_sha256": {},
+      "tokens": {
+        "o200k_base": {
+          "full_files": 118,
+          "directed_source": 19,
+          "hae_lookup_and_imported_contracts": 313,
+          "hae_lookup_and_source_verification": 332,
+          "lookup_saving_vs_full_percent": -165.25,
+          "verified_saving_vs_full_percent": -181.36
+        },
+        "cl100k_base": {
+          "full_files": 104,
+          "directed_source": 19,
+          "hae_lookup_and_imported_contracts": 320,
+          "hae_lookup_and_source_verification": 339,
+          "lookup_saving_vs_full_percent": -207.69,
+          "verified_saving_vs_full_percent": -225.96
+        }
+      }
+    },
+    {
+      "case": "DateInput",
+      "symbol": "DateInput",
+      "repo_id": "frontend",
+      "file": "src/components/form/DateInput.tsx",
+      "sha256": "c45e9387812dfa16f226c7aa0a89d715e2f716a37816368552e6be5515ffa967",
+      "extra_source_files": [],
+      "extra_source_sha256": {},
+      "tokens": {
+        "o200k_base": {
+          "full_files": 1255,
+          "directed_source": 130,
+          "hae_lookup_and_imported_contracts": 551,
+          "hae_lookup_and_source_verification": 681,
+          "lookup_saving_vs_full_percent": 56.1,
+          "verified_saving_vs_full_percent": 45.74
+        },
+        "cl100k_base": {
+          "full_files": 1202,
+          "directed_source": 126,
+          "hae_lookup_and_imported_contracts": 550,
+          "hae_lookup_and_source_verification": 676,
+          "lookup_saving_vs_full_percent": 54.24,
+          "verified_saving_vs_full_percent": 43.76
+        }
+      }
+    },
+    {
+      "case": "ProjectFormModal",
+      "symbol": "ProjectFormModal",
+      "repo_id": "frontend",
+      "file": "src/components/projects/ProjectFormModal.tsx",
+      "sha256": "138a0dff1521fe061344085dc7678727bf581ae14a574379e4d65357e083289b",
+      "extra_source_files": [
+        "src/domain/projects/types.ts"
+      ],
+      "extra_source_sha256": {
+        "src/domain/projects/types.ts": "9efa4d0d46dfeaed4e18f202604ccf502fec8d47ce5495393aeb27cf49348d17"
+      },
+      "tokens": {
+        "o200k_base": {
+          "full_files": 4622,
+          "directed_source": 569,
+          "hae_lookup_and_imported_contracts": 934,
+          "hae_lookup_and_source_verification": 1023,
+          "lookup_saving_vs_full_percent": 79.79,
+          "verified_saving_vs_full_percent": 77.87
+        },
+        "cl100k_base": {
+          "full_files": 4513,
+          "directed_source": 566,
+          "hae_lookup_and_imported_contracts": 936,
+          "hae_lookup_and_source_verification": 1023,
+          "lookup_saving_vs_full_percent": 79.26,
+          "verified_saving_vs_full_percent": 77.33
+        }
+      }
+    },
+    {
+      "case": "ProjectsListTable",
+      "symbol": "ProjectsListTable",
+      "repo_id": "frontend",
+      "file": "src/components/projects/ProjectsListTable.tsx",
+      "sha256": "e2ec80efa7eb3c2ebeb8aa4a173248eacd1ff6613e06f975cee2998d3a272ad6",
+      "extra_source_files": [
+        "src/domain/projects/types.ts",
+        "src/domain/finance/types.ts"
+      ],
+      "extra_source_sha256": {
+        "src/domain/projects/types.ts": "9efa4d0d46dfeaed4e18f202604ccf502fec8d47ce5495393aeb27cf49348d17",
+        "src/domain/finance/types.ts": "78b636763243edd5b766d05820ca83979a5ec31138e54d939ef1619407680d51"
+      },
+      "tokens": {
+        "o200k_base": {
+          "full_files": 2924,
+          "directed_source": 1126,
+          "hae_lookup_and_imported_contracts": 1592,
+          "hae_lookup_and_source_verification": 1760,
+          "lookup_saving_vs_full_percent": 45.55,
+          "verified_saving_vs_full_percent": 39.81
+        },
+        "cl100k_base": {
+          "full_files": 2882,
+          "directed_source": 1128,
+          "hae_lookup_and_imported_contracts": 1595,
+          "hae_lookup_and_source_verification": 1758,
+          "lookup_saving_vs_full_percent": 44.66,
+          "verified_saving_vs_full_percent": 39.0
+        }
+      }
+    }
+  ],
+  "totals": {
+    "o200k_base": {
+      "full_files": 16161,
+      "directed_source": 3599,
+      "hae_lookup_and_imported_contracts": 6149,
+      "hae_lookup_and_source_verification": 6694,
+      "context_initial": 239,
+      "all_hae_tool_schemas_optional": 3103,
+      "hae_session_verified": 6933,
+      "hae_session_verified_plus_all_schemas": 10036,
+      "saving_vs_full_percent": 57.1,
+      "saving_vs_directed_percent": -92.64
+    },
+    "cl100k_base": {
+      "full_files": 15774,
+      "directed_source": 3548,
+      "hae_lookup_and_imported_contracts": 6135,
+      "hae_lookup_and_source_verification": 6666,
+      "context_initial": 277,
+      "all_hae_tool_schemas_optional": 3099,
+      "hae_session_verified": 6943,
+      "hae_session_verified_plus_all_schemas": 10042,
+      "saving_vs_full_percent": 55.98,
+      "saving_vs_directed_percent": -95.69
+    }
+  }
+}

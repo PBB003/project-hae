@@ -4,6 +4,7 @@
 .pytest_cache/
 tmp_pytest/
 .hae-backups/
+.hae-cache/
 env/
 venv/
 

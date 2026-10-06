@@ -6,12 +6,34 @@ from pydantic import BaseModel, Field, StringConstraints, field_validator, model
 NonEmpty = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)]
 
 
+class TypeDependency(BaseModel):
+    name: NonEmpty
+    file_path: NonEmpty
+    contract: NonEmpty
+    source_line: Optional[int] = Field(None, ge=1)
+    requested_as: Optional[str] = None
+    exported: Optional[bool] = None
+    kind: Literal['type','value'] = 'type'
+
+    @field_validator("file_path")
+    @classmethod
+    def relative_path(cls, value):
+        value = value.replace("\\", "/")
+        if PurePosixPath(value).is_absolute() or ".." in PurePosixPath(value).parts or ":" in value:
+            raise ValueError("file_path debe ser una ruta relativa sin ..")
+        return value
+
+
 class CatalogItem(BaseModel):
     repo_id: str = "legacy"
     branch: str = ""
     source_line: Optional[int] = Field(None, ge=1)
     source_end_line: Optional[int] = Field(None, ge=1)
     contract: Optional[str] = None
+    type_dependencies: List[TypeDependency] = Field(default_factory=list)
+    unresolved_types: List[str] = Field(default_factory=list)
+    type_resolution: Literal["not_scanned", "partial", "complete"] = "not_scanned"
+    exported: Optional[bool] = None
     file_path: NonEmpty
 
     @model_validator(mode="after")

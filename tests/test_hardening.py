@@ -204,6 +204,16 @@ def test_checks_report_lines_and_avoid_phantom_imports(tmp_path):
     assert result['unchecked_rules']==['Manual'] and result['passed'] is False
 
 
+def test_checks_skip_generated_pytest_fixtures(tmp_path):
+    artifacts = tmp_path / 'tmp_pytest'
+    artifacts.mkdir()
+    (artifacts / 'fixture.py').write_bytes(b'\xffinvalid generated fixture')
+    (tmp_path / 'code.py').write_text('value = 1\n', encoding='utf-8')
+    rule = {'title': 'Source only', 'check_spec': {'kind': 'forbidden_pattern', 'pattern': 'invalid'}}
+    result = check_rules(tmp_path, [rule])
+    assert result == {'findings': [], 'unchecked_rules': [], 'passed': True}
+
+
 @pytest.mark.parametrize('spec',[{'kind':'exec','command':'do anything'},{'kind':'required_file','path':'../outside'},
                                 {'kind':'forbidden_pattern','pattern':'['},{'kind':'max_file_lines','limit':0}])
 def test_checks_reject_unsafe_or_invalid_specs(spec):

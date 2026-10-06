@@ -97,7 +97,7 @@ class ApiKeyMiddleware:
                 reads = {"hae_get_project_context", "hae_search_components", "hae_search_utilities",
                          "hae_get_session_history", "hae_get_meeting_notes", "hae_get_meeting_detail",
                          "hae_get_youtrack_tasks", "hae_get_youtrack_task_detail", "hae_list_projects",
-                         "hae_query_knowledge", "hae_get_symbol_detail", "hae_get_rules", "hae_get_rule_history"}
+                         "hae_query_knowledge", "hae_get_symbol_detail", "hae_get_symbol", "hae_get_rules", "hae_get_rule_history"}
                 denied = (name != "hae_list_projects" and args.get("project_id") not in identity.projects) or (
                     identity.role == "reader" and name not in reads)
                 if denied:

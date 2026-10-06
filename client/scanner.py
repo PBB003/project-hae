@@ -41,6 +41,7 @@ def scan_codebase(root_dir: str, diagnostics=None) -> Tuple[List[Dict[str, Any]]
     """
     components = []
     utilities = []
+    modules = {}
     
     ignore_dirs = {
         'node_modules', '.next', '.git', 'dist', 'build', 'out',
@@ -99,6 +100,8 @@ def scan_codebase(root_dir: str, diagnostics=None) -> Tuple[List[Dict[str, Any]]
                     is_ui = ext in ('.tsx', '.jsx') or 'component' in rel_path.lower() or 'ui/' in rel_path.lower()
                     is_util_dir = any(k in rel_path.lower() for k in ('util', 'lib', 'helper', 'service', 'tools'))
                     found_c, found_u = ast_parser.extract(content, ext, rel_path, is_ui, is_util_dir, include_contracts=True)
+                    from client.type_resolver import module_info
+                    modules[rel_path] = module_info(content, ext, found_c + found_u)
                     components.extend(found_c)
                     utilities.extend(found_u)
                     continue
@@ -177,6 +180,27 @@ def scan_codebase(root_dir: str, diagnostics=None) -> Tuple[List[Dict[str, Any]]
                         "type": "service" if "service" in rel_path.lower() else "util"
                     })
 
+    if ast_parser.AVAILABLE:
+        from client.type_resolver import TypeResolver
+        resolver = TypeResolver(root_path, modules)
+        for item in components + utilities:
+            resolver.enrich(item)
+        # Indexar también tipos privados necesarios para recuperar bloques omitidos.
+        indexed = {(x['file_path'],x['name']) for x in utilities}
+        additional = {}
+        for item in components + utilities:
+            for dependency in item.get('type_dependencies', []):
+                key = dependency['file_path'], dependency['name']
+                if key not in indexed:
+                    additional[key] = {k:v for k,v in dependency.items() if k != 'requested_as'}
+        for item in additional.values():
+            item.update(type='constant' if item.pop('kind', 'type') == 'value' else 'type',
+                        signature=item['contract'],description='Declaración local requerida por contratos')
+            resolver.enrich(item)
+            utilities.append(item)
+        diagnostics['type_resolution'] = {'resolved': sum(len(x.get('type_dependencies', [])) for x in components + utilities),
+            'partial_symbols': sum(x.get('type_resolution') == 'partial' for x in components + utilities),
+            'config_warnings': resolver.config_warnings}
     # Deduplicar por (name, file_path)
     dedup_components = {f"{c['name']}@{c['file_path']}": c for c in components}.values()
     dedup_utilities = {f"{u['name']}@{u['file_path']}": u for u in utilities}.values()

@@ -1,0 +1,565 @@
+{
+  "measured_at_utc": "2026-10-06T14:53:05.232117+00:00",
+  "tiktoken_version": "0.14.0",
+  "mode": "advanced",
+  "hae_lookup_calls": 7,
+  "scope": "Recuperación de interfaces de 7 símbolos preseleccionados de archivos reales de Tekniek",
+  "method": "Textos de argumentos/respuestas MCP, contexto inicial una vez, fuente completa o declaración dirigida; sin generación de código ni facturación",
+  "scan": {
+    "frontend": {
+      "components": 321,
+      "utilities": 1435,
+      "engine": "tree-sitter",
+      "errors": [
+        {
+          "path": "src/app/layout.tsx",
+          "reason": "Sintaxis no reconocida por AST"
+        }
+      ],
+      "scanned_files": 602,
+      "type_resolution": {
+        "resolved": 3536,
+        "partial_symbols": 121,
+        "config_warnings": []
+      }
+    },
+    "backend": {
+      "components": 0,
+      "utilities": 3063,
+      "engine": "tree-sitter",
+      "errors": [],
+      "scanned_files": 722,
+      "type_resolution": {
+        "resolved": 10117,
+        "partial_symbols": 795,
+        "config_warnings": []
+      }
+    }
+  },
+  "cases": [
+    {
+      "case": "Checkbox",
+      "symbol": "Checkbox",
+      "repo_id": "frontend",
+      "file": "src/components/form/input/Checkbox.tsx",
+      "sha256": "e2ab847970cc6b6a238bea5ba447df63e74cdf6a5c2b32f7b03baae391a3f39a",
+      "extra_source_files": [],
+      "extra_source_sha256": {},
+      "tokens": {
+        "o200k_base": {
+          "full_files": 462,
+          "directed_source": 88,
+          "hae_lookup_and_imported_contracts": 275,
+          "hae_lookup_and_source_verification": 363,
+          "lookup_saving_vs_full_percent": 40.48,
+          "verified_saving_vs_full_percent": 21.43,
+          "full_files_with_dependency_graph": 462,
+          "hae_lookup_and_previous_source_verification": 363,
+          "hae_revalidation_only": 119,
+          "hae_direct_lookup_and_source_verification": 367,
+          "hae_known_types_and_previous_source_verification": 363
+        },
+        "cl100k_base": {
+          "full_files": 448,
+          "directed_source": 84,
+          "hae_lookup_and_imported_contracts": 270,
+          "hae_lookup_and_source_verification": 354,
+          "lookup_saving_vs_full_percent": 39.73,
+          "verified_saving_vs_full_percent": 20.98,
+          "full_files_with_dependency_graph": 448,
+          "hae_lookup_and_previous_source_verification": 354,
+          "hae_revalidation_only": 120,
+          "hae_direct_lookup_and_source_verification": 360,
+          "hae_known_types_and_previous_source_verification": 356
+        }
+      },
+      "dependency_source_sha256": {},
+      "resolved_types": [],
+      "unresolved_types": [
+        "React.FC"
+      ],
+      "default_budget_partial": false,
+      "default_budget_omissions": null
+    },
+    {
+      "case": "Crear proyecto: frontend",
+      "symbol": "createProject",
+      "repo_id": "frontend",
+      "file": "src/infrastructure/services/OperationsService.ts",
+      "sha256": "4a727b3bca3245e559e109ff51adcb547ec05318bb5ac074e9d836a97559eedb",
+      "extra_source_files": [
+        "src/application/dtos/OperationsDTO.ts"
+      ],
+      "extra_source_sha256": {
+        "src/application/dtos/OperationsDTO.ts": "f67f17e608107e1af1d6396198c8d9a730caf49ef73b43f2ba50082bc1e37424"
+      },
+      "tokens": {
+        "o200k_base": {
+          "full_files": 4706,
+          "directed_source": 677,
+          "hae_lookup_and_imported_contracts": 1234,
+          "hae_lookup_and_source_verification": 1911,
+          "lookup_saving_vs_full_percent": 73.78,
+          "verified_saving_vs_full_percent": 59.39,
+          "full_files_with_dependency_graph": 4706,
+          "hae_lookup_and_previous_source_verification": 2515,
+          "hae_revalidation_only": 103,
+          "hae_direct_lookup_and_source_verification": 1924,
+          "hae_known_types_and_previous_source_verification": 1487
+        },
+        "cl100k_base": {
+          "full_files": 4597,
+          "directed_source": 670,
+          "hae_lookup_and_imported_contracts": 1229,
+          "hae_lookup_and_source_verification": 1899,
+          "lookup_saving_vs_full_percent": 73.27,
+          "verified_saving_vs_full_percent": 58.69,
+          "full_files_with_dependency_graph": 4597,
+          "hae_lookup_and_previous_source_verification": 2472,
+          "hae_revalidation_only": 109,
+          "hae_direct_lookup_and_source_verification": 1911,
+          "hae_known_types_and_previous_source_verification": 1449
+        }
+      },
+      "dependency_source_sha256": {
+        "src/application/dtos/OperationsDTO.ts": "f67f17e608107e1af1d6396198c8d9a730caf49ef73b43f2ba50082bc1e37424"
+      },
+      "resolved_types": [
+        {
+          "name": "AUCTION_FOLDER_TYPES",
+          "file_path": "src/application/dtos/OperationsDTO.ts"
+        },
+        {
+          "name": "AuctionFolderType",
+          "file_path": "src/application/dtos/OperationsDTO.ts"
+        },
+        {
+          "name": "BidRef",
+          "file_path": "src/application/dtos/OperationsDTO.ts"
+        },
+        {
+          "name": "CertifiedPayrollFolderType",
+          "file_path": "src/application/dtos/OperationsDTO.ts"
+        },
+        {
+          "name": "CreateProjectInput",
+          "file_path": "src/application/dtos/OperationsDTO.ts"
+        },
+        {
+          "name": "FolderType",
+          "file_path": "src/application/dtos/OperationsDTO.ts"
+        },
+        {
+          "name": "LegacyFolderType",
+          "file_path": "src/application/dtos/OperationsDTO.ts"
+        },
+        {
+          "name": "PROJECT_FOLDER_TYPES",
+          "file_path": "src/application/dtos/OperationsDTO.ts"
+        },
+        {
+          "name": "ProjectDetailResponse",
+          "file_path": "src/application/dtos/OperationsDTO.ts"
+        },
+        {
+          "name": "ProjectFolderSummary",
+          "file_path": "src/application/dtos/OperationsDTO.ts"
+        },
+        {
+          "name": "ProjectFolderType",
+          "file_path": "src/application/dtos/OperationsDTO.ts"
+        },
+        {
+          "name": "ProjectListItem",
+          "file_path": "src/application/dtos/OperationsDTO.ts"
+        },
+        {
+          "name": "ProjectSharepointStatus",
+          "file_path": "src/application/dtos/OperationsDTO.ts"
+        },
+        {
+          "name": "ProjectSharepointStatusKind",
+          "file_path": "src/application/dtos/OperationsDTO.ts"
+        }
+      ],
+      "unresolved_types": [],
+      "default_budget_partial": true,
+      "default_budget_omissions": {
+        "max_tokens": 4096,
+        "counting": "utf8_bytes_upper_bound",
+        "omitted_results": 0,
+        "omitted_types": 3,
+        "omitted_contracts": 0
+      }
+    },
+    {
+      "case": "Crear proyecto: backend",
+      "symbol": "ProjectService.createProject",
+      "repo_id": "backend",
+      "file": "src/operations/domain/services/project.service.ts",
+      "sha256": "89c605c6f1f3b61335a2e0c7a98b320414197d284b7d1a2c2dcab1ce82484c85",
+      "extra_source_files": [
+        "src/operations/ports/inbound/manage-projects.port.ts"
+      ],
+      "extra_source_sha256": {
+        "src/operations/ports/inbound/manage-projects.port.ts": "01c111c3dfa93cf7e5bb8f37d6c584f8a3845a9f8e73677ab0429634c80233a8"
+      },
+      "tokens": {
+        "o200k_base": {
+          "full_files": 2074,
+          "directed_source": 765,
+          "hae_lookup_and_imported_contracts": 1247,
+          "hae_lookup_and_source_verification": 2012,
+          "lookup_saving_vs_full_percent": 39.87,
+          "verified_saving_vs_full_percent": 2.99,
+          "full_files_with_dependency_graph": 6443,
+          "hae_lookup_and_previous_source_verification": 1633,
+          "hae_revalidation_only": 115,
+          "hae_direct_lookup_and_source_verification": 2021,
+          "hae_known_types_and_previous_source_verification": 594
+        },
+        "cl100k_base": {
+          "full_files": 2028,
+          "directed_source": 755,
+          "hae_lookup_and_imported_contracts": 1239,
+          "hae_lookup_and_source_verification": 1994,
+          "lookup_saving_vs_full_percent": 38.91,
+          "verified_saving_vs_full_percent": 1.68,
+          "full_files_with_dependency_graph": 6288,
+          "hae_lookup_and_previous_source_verification": 1621,
+          "hae_revalidation_only": 119,
+          "hae_direct_lookup_and_source_verification": 2002,
+          "hae_known_types_and_previous_source_verification": 589
+        }
+      },
+      "dependency_source_sha256": {
+        "src/operations/domain/models/folder.model.ts": "9fa35dd9c37f97f25b60a4af61c1e2bba3481d146c5d0dae9b845ad67c840876",
+        "src/operations/domain/models/project.model.ts": "3ed6093cceba6b019957a65edf81ec2e09782a0b935726375dd0d921c257784c",
+        "src/operations/domain/models/refs.ts": "370a2bcc18c1a76f3c2cccd6d731705c300f1e162312e91d2258560eb25b2e99",
+        "src/operations/domain/project-sharepoint-status.ts": "400a37e31afa1b8fbade8518c89ee718cb70ec50130472fe24e98ca451f7a096",
+        "src/operations/ports/inbound/manage-projects.port.ts": "01c111c3dfa93cf7e5bb8f37d6c584f8a3845a9f8e73677ab0429634c80233a8",
+        "src/sharepoint/domain/folder-naming.ts": "41859967d8e7b69c025f646160ed17f172e6cccc26cadef5fcdd9e81c94ab9f3"
+      },
+      "resolved_types": [
+        {
+          "name": "FolderType",
+          "file_path": "src/operations/domain/models/folder.model.ts"
+        },
+        {
+          "name": "ProjectFolderRef",
+          "file_path": "src/operations/domain/models/project.model.ts"
+        },
+        {
+          "name": "ProjectModel",
+          "file_path": "src/operations/domain/models/project.model.ts"
+        },
+        {
+          "name": "ProjectVehicleRef",
+          "file_path": "src/operations/domain/models/project.model.ts"
+        },
+        {
+          "name": "AuctionRef",
+          "file_path": "src/operations/domain/models/refs.ts"
+        },
+        {
+          "name": "NamedRef",
+          "file_path": "src/operations/domain/models/refs.ts"
+        },
+        {
+          "name": "VehicleRef",
+          "file_path": "src/operations/domain/models/refs.ts"
+        },
+        {
+          "name": "ProjectSharepointStatus",
+          "file_path": "src/operations/domain/project-sharepoint-status.ts"
+        },
+        {
+          "name": "ProjectSharepointStatusKind",
+          "file_path": "src/operations/domain/project-sharepoint-status.ts"
+        },
+        {
+          "name": "CreateProjectInput",
+          "file_path": "src/operations/ports/inbound/manage-projects.port.ts"
+        },
+        {
+          "name": "AuctionFolderType",
+          "file_path": "src/sharepoint/domain/folder-naming.ts"
+        },
+        {
+          "name": "ProjectFolderType",
+          "file_path": "src/sharepoint/domain/folder-naming.ts"
+        }
+      ],
+      "unresolved_types": [],
+      "default_budget_partial": true,
+      "default_budget_omissions": {
+        "max_tokens": 4096,
+        "counting": "utf8_bytes_upper_bound",
+        "omitted_results": 0,
+        "omitted_types": 3,
+        "omitted_contracts": 0
+      }
+    },
+    {
+      "case": "useModal",
+      "symbol": "useModal",
+      "repo_id": "frontend",
+      "file": "src/hooks/useModal.ts",
+      "sha256": "50c64e1334bbf10f9ac895c3f3168ff9358d8605391d6cc0af26f6f02f577baf",
+      "extra_source_files": [],
+      "extra_source_sha256": {},
+      "tokens": {
+        "o200k_base": {
+          "full_files": 118,
+          "directed_source": 19,
+          "hae_lookup_and_imported_contracts": 174,
+          "hae_lookup_and_source_verification": 193,
+          "lookup_saving_vs_full_percent": -47.46,
+          "verified_saving_vs_full_percent": -63.56,
+          "full_files_with_dependency_graph": 118,
+          "hae_lookup_and_previous_source_verification": 193,
+          "hae_revalidation_only": 107,
+          "hae_direct_lookup_and_source_verification": 199,
+          "hae_known_types_and_previous_source_verification": 197
+        },
+        "cl100k_base": {
+          "full_files": 104,
+          "directed_source": 19,
+          "hae_lookup_and_imported_contracts": 174,
+          "hae_lookup_and_source_verification": 193,
+          "lookup_saving_vs_full_percent": -67.31,
+          "verified_saving_vs_full_percent": -85.58,
+          "full_files_with_dependency_graph": 104,
+          "hae_lookup_and_previous_source_verification": 193,
+          "hae_revalidation_only": 109,
+          "hae_direct_lookup_and_source_verification": 201,
+          "hae_known_types_and_previous_source_verification": 197
+        }
+      },
+      "dependency_source_sha256": {},
+      "resolved_types": [],
+      "unresolved_types": [],
+      "default_budget_partial": false,
+      "default_budget_omissions": null
+    },
+    {
+      "case": "DateInput",
+      "symbol": "DateInput",
+      "repo_id": "frontend",
+      "file": "src/components/form/DateInput.tsx",
+      "sha256": "c45e9387812dfa16f226c7aa0a89d715e2f716a37816368552e6be5515ffa967",
+      "extra_source_files": [],
+      "extra_source_sha256": {},
+      "tokens": {
+        "o200k_base": {
+          "full_files": 1255,
+          "directed_source": 130,
+          "hae_lookup_and_imported_contracts": 318,
+          "hae_lookup_and_source_verification": 448,
+          "lookup_saving_vs_full_percent": 74.66,
+          "verified_saving_vs_full_percent": 64.3,
+          "full_files_with_dependency_graph": 1255,
+          "hae_lookup_and_previous_source_verification": 448,
+          "hae_revalidation_only": 114,
+          "hae_direct_lookup_and_source_verification": 456,
+          "hae_known_types_and_previous_source_verification": 456
+        },
+        "cl100k_base": {
+          "full_files": 1202,
+          "directed_source": 126,
+          "hae_lookup_and_imported_contracts": 316,
+          "hae_lookup_and_source_verification": 442,
+          "lookup_saving_vs_full_percent": 73.71,
+          "verified_saving_vs_full_percent": 63.23,
+          "full_files_with_dependency_graph": 1202,
+          "hae_lookup_and_previous_source_verification": 442,
+          "hae_revalidation_only": 119,
+          "hae_direct_lookup_and_source_verification": 450,
+          "hae_known_types_and_previous_source_verification": 448
+        }
+      },
+      "dependency_source_sha256": {},
+      "resolved_types": [],
+      "unresolved_types": [],
+      "default_budget_partial": false,
+      "default_budget_omissions": null
+    },
+    {
+      "case": "ProjectFormModal",
+      "symbol": "ProjectFormModal",
+      "repo_id": "frontend",
+      "file": "src/components/projects/ProjectFormModal.tsx",
+      "sha256": "138a0dff1521fe061344085dc7678727bf581ae14a574379e4d65357e083289b",
+      "extra_source_files": [
+        "src/domain/projects/types.ts"
+      ],
+      "extra_source_sha256": {
+        "src/domain/projects/types.ts": "9efa4d0d46dfeaed4e18f202604ccf502fec8d47ce5495393aeb27cf49348d17"
+      },
+      "tokens": {
+        "o200k_base": {
+          "full_files": 4622,
+          "directed_source": 328,
+          "hae_lookup_and_imported_contracts": 610,
+          "hae_lookup_and_source_verification": 938,
+          "lookup_saving_vs_full_percent": 86.8,
+          "verified_saving_vs_full_percent": 79.71,
+          "full_files_with_dependency_graph": 5232,
+          "hae_lookup_and_previous_source_verification": 1179,
+          "hae_revalidation_only": 111,
+          "hae_direct_lookup_and_source_verification": 949,
+          "hae_known_types_and_previous_source_verification": 850
+        },
+        "cl100k_base": {
+          "full_files": 4513,
+          "directed_source": 326,
+          "hae_lookup_and_imported_contracts": 611,
+          "hae_lookup_and_source_verification": 937,
+          "lookup_saving_vs_full_percent": 86.46,
+          "verified_saving_vs_full_percent": 79.24,
+          "full_files_with_dependency_graph": 5127,
+          "hae_lookup_and_previous_source_verification": 1177,
+          "hae_revalidation_only": 120,
+          "hae_direct_lookup_and_source_verification": 944,
+          "hae_known_types_and_previous_source_verification": 847
+        }
+      },
+      "dependency_source_sha256": {
+        "src/domain/projects/lifecycle.ts": "ee8271d9b940d4f2073a9c9db633a0849451fb84981287d0f493fbbf669c66f5",
+        "src/domain/projects/types.ts": "9efa4d0d46dfeaed4e18f202604ccf502fec8d47ce5495393aeb27cf49348d17"
+      },
+      "resolved_types": [
+        {
+          "name": "ProjectLifecycleStatus",
+          "file_path": "src/domain/projects/lifecycle.ts"
+        },
+        {
+          "name": "ProjectPortfolioRow",
+          "file_path": "src/domain/projects/types.ts"
+        },
+        {
+          "name": "ProjectPortfolioStatus",
+          "file_path": "src/domain/projects/types.ts"
+        }
+      ],
+      "unresolved_types": [],
+      "default_budget_partial": false,
+      "default_budget_omissions": null
+    },
+    {
+      "case": "ProjectsListTable",
+      "symbol": "ProjectsListTable",
+      "repo_id": "frontend",
+      "file": "src/components/projects/ProjectsListTable.tsx",
+      "sha256": "e2ec80efa7eb3c2ebeb8aa4a173248eacd1ff6613e06f975cee2998d3a272ad6",
+      "extra_source_files": [
+        "src/domain/projects/types.ts",
+        "src/domain/finance/types.ts"
+      ],
+      "extra_source_sha256": {
+        "src/domain/projects/types.ts": "9efa4d0d46dfeaed4e18f202604ccf502fec8d47ce5495393aeb27cf49348d17",
+        "src/domain/finance/types.ts": "78b636763243edd5b766d05820ca83979a5ec31138e54d939ef1619407680d51"
+      },
+      "tokens": {
+        "o200k_base": {
+          "full_files": 2924,
+          "directed_source": 569,
+          "hae_lookup_and_imported_contracts": 932,
+          "hae_lookup_and_source_verification": 1501,
+          "lookup_saving_vs_full_percent": 68.13,
+          "verified_saving_vs_full_percent": 48.67,
+          "full_files_with_dependency_graph": 3534,
+          "hae_lookup_and_previous_source_verification": 2058,
+          "hae_revalidation_only": 109,
+          "hae_direct_lookup_and_source_verification": 1510,
+          "hae_known_types_and_previous_source_verification": 1498
+        },
+        "cl100k_base": {
+          "full_files": 2882,
+          "directed_source": 564,
+          "hae_lookup_and_imported_contracts": 929,
+          "hae_lookup_and_source_verification": 1493,
+          "lookup_saving_vs_full_percent": 67.77,
+          "verified_saving_vs_full_percent": 48.2,
+          "full_files_with_dependency_graph": 3496,
+          "hae_lookup_and_previous_source_verification": 2057,
+          "hae_revalidation_only": 116,
+          "hae_direct_lookup_and_source_verification": 1499,
+          "hae_known_types_and_previous_source_verification": 1494
+        }
+      },
+      "dependency_source_sha256": {
+        "src/domain/finance/types.ts": "78b636763243edd5b766d05820ca83979a5ec31138e54d939ef1619407680d51",
+        "src/domain/projects/lifecycle.ts": "ee8271d9b940d4f2073a9c9db633a0849451fb84981287d0f493fbbf669c66f5",
+        "src/domain/projects/types.ts": "9efa4d0d46dfeaed4e18f202604ccf502fec8d47ce5495393aeb27cf49348d17"
+      },
+      "resolved_types": [
+        {
+          "name": "FinanceProjectRow",
+          "file_path": "src/domain/finance/types.ts"
+        },
+        {
+          "name": "FinanceProjectStatus",
+          "file_path": "src/domain/finance/types.ts"
+        },
+        {
+          "name": "ProjectLifecycleStatus",
+          "file_path": "src/domain/projects/lifecycle.ts"
+        },
+        {
+          "name": "ProjectPortfolioRow",
+          "file_path": "src/domain/projects/types.ts"
+        },
+        {
+          "name": "ProjectPortfolioStatus",
+          "file_path": "src/domain/projects/types.ts"
+        }
+      ],
+      "unresolved_types": [],
+      "default_budget_partial": false,
+      "default_budget_omissions": null
+    }
+  ],
+  "totals": {
+    "o200k_base": {
+      "full_files": 16161,
+      "directed_source": 2576,
+      "hae_lookup_and_imported_contracts": 4790,
+      "hae_lookup_and_source_verification": 7366,
+      "context_initial": 283,
+      "all_hae_tool_schemas_optional": 3793,
+      "hae_session_verified": 7649,
+      "hae_session_verified_plus_all_schemas": 11442,
+      "saving_vs_full_percent": 52.67,
+      "saving_vs_directed_percent": -196.93,
+      "full_files_with_dependency_graph": 21750,
+      "hae_lookup_and_previous_source_verification": 8389,
+      "hae_revalidation_only": 778,
+      "hae_direct_lookup_and_source_verification": 7426,
+      "hae_known_types_and_previous_source_verification": 5445,
+      "context_revalidation_only": 85,
+      "hae_session_revalidation_only": 863,
+      "saving_vs_expanded_full_percent": 64.83
+    },
+    "cl100k_base": {
+      "full_files": 15774,
+      "directed_source": 2544,
+      "hae_lookup_and_imported_contracts": 4768,
+      "hae_lookup_and_source_verification": 7312,
+      "context_initial": 322,
+      "all_hae_tool_schemas_optional": 3784,
+      "hae_session_verified": 7634,
+      "hae_session_verified_plus_all_schemas": 11418,
+      "saving_vs_full_percent": 51.6,
+      "saving_vs_directed_percent": -200.08,
+      "full_files_with_dependency_graph": 21262,
+      "hae_lookup_and_previous_source_verification": 8316,
+      "hae_revalidation_only": 812,
+      "hae_direct_lookup_and_source_verification": 7367,
+      "hae_known_types_and_previous_source_verification": 5380,
+      "context_revalidation_only": 90,
+      "hae_session_revalidation_only": 902,
+      "saving_vs_expanded_full_percent": 64.1
+    }
+  }
+}

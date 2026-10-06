@@ -91,6 +91,37 @@ def test_mcp_session_cannot_be_reused_with_different_credential(live_server):
     asyncio.run(asyncio.wait_for(run(), timeout=15))
 
 
+def test_search_levels_cross_real_sse(live_server, auth_headers):
+    url, keys = live_server
+    with httpx.Client(base_url=url) as client:
+        client.post('/api/sync', headers=auth_headers, json={'project': {'id': 'p', 'name': 'P'},
+            'utilities': [{'name': 'useReady', 'file_path': 'ready.ts', 'signature': 'useReady(): boolean',
+                           'contract': 'function useReady(): boolean'}]}).raise_for_status()
+    async def run():
+        async with sse_client(url+'/sse', headers={'X-HAE-Key': keys[0].key}, timeout=5, sse_read_timeout=10) as (read, write):
+            async with ClientSession(read, write) as session:
+                await session.initialize()
+                tools = await session.list_tools()
+                schema = next(t.input_schema for t in tools.tools if t.name == 'hae_search_utilities')
+                assert schema['properties']['response_level']['enum'] == ['location', 'contract', 'detail']
+                for level in ['location', 'contract', 'detail']:
+                    result = await session.call_tool('hae_search_utilities', {'project_id': 'p', 'query': 'useReady', 'response_level': level})
+                    assert not result.is_error
+                    response = json.loads(result.content[0].text)
+                    assert response['level'] == level
+                    assert ('contract' in response['results'][0]) == (level != 'location')
+                invalid = await session.call_tool('hae_search_utilities', {'project_id': 'p', 'response_level': 'unknown'})
+                assert invalid.is_error
+                exact_args = {'project_id':'p','name':'useReady','file_path':'ready.ts'}
+                first = await session.call_tool('hae_get_symbol',exact_args)
+                assert not first.is_error
+                etag = json.loads(first.content[0].text)['etag']
+                reused = await session.call_tool('hae_get_symbol',{**exact_args,'if_none_match':etag})
+                assert not reused.is_error
+                assert json.loads(reused.content[0].text)=={'not_modified':True,'etag':etag}
+    asyncio.run(asyncio.wait_for(run(), timeout=15))
+
+
 def test_cli_doctor_and_snapshot_work_against_local_server(live_server, tmp_path, auth_headers):
     url, keys = live_server
     workspace = tmp_path/'workspace'; workspace.mkdir()

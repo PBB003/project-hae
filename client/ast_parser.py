@@ -44,6 +44,34 @@ def _parser_for(ext: str):
     return _parsers[key]
 
 
+def syntax_errors(root) -> List[Dict[str, Any]]:
+    """Errores reales de sintaxis, conservando el texto y offsets originales.
+
+    La gramática TSX marca ampersands sin entidad HTML en atributos JSX como
+    ERROR (p. ej. una URL con &display=swap). Dentro de una cadena de atributo
+    correctamente cerrada son texto válido; no suprimir errores de expresiones,
+    etiquetas, comillas faltantes ni otros contextos.
+    """
+    errors = []
+    stack = [root]
+    while stack:
+        node = stack.pop()
+        if node.type == 'ERROR' or node.is_missing:
+            parent = node.parent
+            quoted_attribute = (parent is not None and parent.type == 'string'
+                                and parent.parent is not None and parent.parent.type == 'jsx_attribute')
+            value = parent.text if quoted_attribute else b''
+            ampersand_text = (not node.is_missing and node.text.startswith(b'&')
+                              and len(value) >= 2 and value[:1] in (b'"', b"'")
+                              and value[-1:] == value[:1] and value[:1] not in node.text)
+            if not (quoted_attribute and ampersand_text):
+                errors.append({'reason': 'Sintaxis no reconocida por AST',
+                               'line': node.start_point.row + 1, 'column': node.start_point.column + 1})
+        if node.has_error:
+            stack.extend(reversed(node.children))
+    return errors
+
+
 def _txt(node) -> str:
     return node.text.decode("utf-8", "ignore") if node is not None else ""
 

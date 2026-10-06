@@ -444,6 +444,22 @@ def main():
             diagnostics = {}
             components, utilities = scan_codebase(str(path),diagnostics)
             if diagnostics.get('errors') or diagnostics.get('engine') != 'tree-sitter':
+                print(f"[Diagnóstico] {repo_id}: motor={diagnostics.get('engine', 'desconocido')}; "
+                      f"archivos={diagnostics.get('scanned_files', 0)}; Python={sys.executable}")
+                if diagnostics.get('engine') != 'tree-sitter':
+                    print(f"[Parser] {diagnostics.get('parser_error') or 'El parser AST no está disponible'}")
+                    print(f'[Solución] "{sys.executable}" -m pip install "tree-sitter==0.25.2" "tree-sitter-typescript>=0.23"')
+                errors = diagnostics.get('errors', [])
+                for error in errors[:20]:
+                    if isinstance(error, dict):
+                        location = error.get('path', '?')
+                        if error.get('line'):
+                            location += f":{error['line']}:{error.get('column', 1)}"
+                        print(f"[Archivo] {location}: {error.get('reason', 'Error de escaneo')}")
+                    else:
+                        print(f"[Archivo] {error}")
+                if len(errors) > 20:
+                    print(f"[Diagnóstico] {len(errors) - 20} errores adicionales")
                 raise ValueError(f"Escaneo incompleto de {repo_id}; no se reemplazará el catálogo")
             info = manifest(repo_id,path,allow_empty=args.allow_empty)
             if any(info[key] != before_scan[key] for key in ("branch","commit_sha","dirty")):

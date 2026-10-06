@@ -68,6 +68,76 @@ def test_sync_refuses_old_server_or_incomplete_scanner(tmp_path, monkeypatch, ve
     send.assert_not_called()
 
 
+@pytest.mark.parametrize('engine,errors,parser_error,expected', [
+    ('regex', [], 'Se requiere tree-sitter==0.25.2', 'Se requiere tree-sitter==0.25.2'),
+    ('tree-sitter', [{'path': 'src/broken.ts', 'reason': 'Sintaxis no reconocida por AST'}], '',
+     'src/broken.ts: Sintaxis no reconocida por AST'),
+])
+def test_sync_reports_cause_without_uploading_incomplete_catalog(
+        tmp_path, monkeypatch, capsys, engine, errors, parser_error, expected):
+    monkeypatch.setattr(sys, 'argv', ['hae', 'sync', '--path', str(tmp_path)])
+    monkeypatch.setattr(hae_sync, 'load_or_create_config', lambda _: {'project': {'id': 'p'}})
+    monkeypatch.setattr(hae_sync, 'request_json', lambda _, path: {'api_version': 2} if path == '/api/health' else {'repositories': []})
+    def scan(path, diagnostics):
+        diagnostics.update(engine=engine, errors=errors, parser_error=parser_error, scanned_files=12)
+        return [], []
+    monkeypatch.setattr(hae_sync, 'scan_codebase', scan)
+    send = Mock()
+    monkeypatch.setattr(hae_sync, 'sync_to_server', send)
+    with pytest.raises(SystemExit) as error:
+        hae_sync.main()
+    output = capsys.readouterr().out
+    assert error.value.code == 1 and expected in output and 'archivos=12' in output
+    assert sys.executable in output and 'no se reemplazará el catálogo' in output
+    if engine == 'regex':
+        assert '-m pip install "tree-sitter==0.25.2"' in output
+    send.assert_not_called()
+
+
+def test_scanner_reports_unavailable_parser_reason(tmp_path, monkeypatch):
+    from client import scanner
+    (tmp_path / 'service.ts').write_text('export function run() { return 1; }', encoding='utf-8')
+    monkeypatch.setattr(scanner.ast_parser, 'AVAILABLE', False)
+    monkeypatch.setattr(scanner.ast_parser, 'INIT_ERROR', 'Se requiere tree-sitter==0.25.2')
+    diagnostics = {}
+    scanner.scan_codebase(tmp_path, diagnostics)
+    assert diagnostics['engine'] == 'regex'
+    assert diagnostics['parser_error'] == 'Se requiere tree-sitter==0.25.2'
+    assert diagnostics['scanned_files'] == 1
+
+
+def test_jsx_url_ampersand_does_not_block_scan_or_change_contract(tmp_path):
+    from client.scanner import scan_codebase
+    source = 'export function FontLink(icon = <link href="https://fonts.example/css?family=Inter&display=swap" />) { return <div>{icon}</div>; }'
+    path = tmp_path / 'FontLink.tsx'
+    path.write_text(source, encoding='utf-8')
+    tree = ast_parser._parser_for('.tsx').parse(source.encode())
+    assert tree.root_node.has_error  # Reproduce the grammar's false positive.
+    diagnostics = {}
+    components, _ = scan_codebase(tmp_path, diagnostics)
+    assert not diagnostics['errors']
+    assert components[0]['name'] == 'FontLink'
+    assert 'family=Inter&display=swap' in components[0]['contract']
+    assert '&amp;' not in components[0]['contract']
+    assert path.read_text(encoding='utf-8') == source
+
+
+@pytest.mark.parametrize('source', [
+    'export function Broken() { return <div href={broken(&display=swap)} />; }',
+    'export function Broken() { return <div href="url&display=swap />; }',
+    'export function Broken() { return <div href="url&display=swap"; }',
+    'export function Broken() { return <div href="url&display=swap" />; const x = ; }',
+])
+def test_ampersand_compatibility_does_not_hide_real_syntax_errors(tmp_path, source):
+    from client.scanner import scan_codebase
+    (tmp_path / 'Broken.tsx').write_text(source, encoding='utf-8')
+    diagnostics = {}
+    assert scan_codebase(tmp_path, diagnostics) == ([], [])
+    assert diagnostics['errors']
+    assert all(error['path'] == 'Broken.tsx' and error['line'] >= 1 and error['column'] >= 1
+               for error in diagnostics['errors'])
+
+
 def test_offline_check_does_not_depend_on_folder_project_identity(tmp_path, monkeypatch):
     (tmp_path/'AGENTS.md').write_text('hae_get_project_context(project_id="correct")')
     rules = tmp_path/'rules.json'; rules.write_text('[{"title":"Instructions","check_spec":{"kind":"required_file","path":"AGENTS.md"}}]')

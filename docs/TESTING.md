@@ -17,7 +17,7 @@ En Linux/macOS utiliza `.venv-test/bin/python`. Los casos AST requieren tree-sit
 - Transporte SSE real en localhost: identidad del actor, propuestas y rechazo de una sesión usada con otra credencial.
 - Aislamiento por repositorio/rama, conflictos de revisión/commit/fecha, snapshots vacíos, merge legado y transacciones sin escrituras parciales.
 - Migración de SQLite antigua y repetición del arranque, conservación de IDs y claves foráneas.
-- Props complejas, genéricos, literales, métodos públicos y contratos de tipos locales.
+- Props complejas, genéricos, literales, métodos públicos y contratos de tipos locales; URLs con ampersands en atributos JSX válidos, sin modificar texto ni ocultar errores reales de sintaxis.
 - Estabilidad nativa del parser en un subproceso: 1.200 extracciones con recolección de memoria forzada.
 - Ranking bilingüe y búsqueda literal, origen y metadatos del catálogo.
 - Niveles MCP location/contract/detail, contrato íntegro sin segunda llamada, ambigüedad independiente de limit y filtros por rama; esquema y validación por SSE real.
@@ -28,7 +28,7 @@ En Linux/macOS utiliza `.venv-test/bin/python`. Los casos AST requieren tree-sit
 - YouTrack paginado, tickets resueltos, fallos parciales, datos inválidos, asignaciones por usuario y reconciliación que conserva eventos posteriores.
 - Webhooks autenticados/idempotentes, recuperación autoritativa, fallos persistentes y reintentos; eventos de borrado fuera de orden.
 - Identidad, orden y notas completas de reuniones; próximos pasos y texto de tablas.
-- CLI: identidad errónea, fallo externo, versión antigua, configuración y códigos de salida.
+- CLI: identidad errónea, fallo externo, versión antigua, configuración y códigos de salida; causa del parser no disponible y archivo que bloquea un snapshot incompleto, sin subirlo.
 
 `conftest.py` crea una clave aleatoria y una SQLite en `tmp_path` por caso. Las pruebas externas sustituyen la red por respuestas simuladas; `test_mcp_transport.py` abre exclusivamente un servidor temporal en `127.0.0.1` y lo detiene al finalizar. No usan la base ni credenciales de producción.
 

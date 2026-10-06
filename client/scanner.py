@@ -56,7 +56,9 @@ def scan_codebase(root_dir: str, diagnostics=None) -> Tuple[List[Dict[str, Any]]
         raise ValueError(f"Directorio inexistente: {root_dir}")
     if diagnostics is None:
         diagnostics = {}
-    diagnostics.update(engine=ENGINE, errors=[], scanned_files=0)
+    diagnostics.update(engine="tree-sitter" if ast_parser.AVAILABLE else "regex",
+                       parser_error=ast_parser.INIT_ERROR if not ast_parser.AVAILABLE else "",
+                       errors=[], scanned_files=0)
 
     def walk_error(exc):
         diagnostics["errors"].append({"path": str(Path(exc.filename).relative_to(root_path)), "reason": type(exc).__name__})
@@ -94,8 +96,10 @@ def scan_codebase(root_dir: str, diagnostics=None) -> Tuple[List[Dict[str, Any]]
 
             if ast_parser.AVAILABLE:
                 try:
-                    if ast_parser._parser_for(ext).parse(content.encode('utf-8')).root_node.has_error:
-                        diagnostics['errors'].append({'path':rel_path,'reason':'Sintaxis no reconocida por AST'})
+                    tree = ast_parser._parser_for(ext).parse(content.encode('utf-8'))
+                    syntax_errors = ast_parser.syntax_errors(tree.root_node)
+                    if syntax_errors:
+                        diagnostics['errors'].extend({'path': rel_path, **error} for error in syntax_errors)
                         continue
                     is_ui = ext in ('.tsx', '.jsx') or 'component' in rel_path.lower() or 'ui/' in rel_path.lower()
                     is_util_dir = any(k in rel_path.lower() for k in ('util', 'lib', 'helper', 'service', 'tools'))

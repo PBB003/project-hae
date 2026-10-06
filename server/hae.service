@@ -1,0 +1,17 @@
+[Unit]
+Description=HAE (Harness AI Efficiency) Context Server
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu/Project-HAE
+ExecStart=/home/ubuntu/Project-HAE/.venv/bin/python -m server.main
+Restart=always
+RestartSec=5
+Environment=HAE_PORT=8000
+Environment=HAE_HOST=127.0.0.1
+EnvironmentFile=/home/ubuntu/Project-HAE/.env
+
+[Install]
+WantedBy=multi-user.target

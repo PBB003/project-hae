@@ -1,0 +1,18 @@
+services:
+  hae-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: hae-context-server
+    restart: always
+    ports:
+      - "127.0.0.1:8000:8000"
+    env_file:
+      - .env
+    environment:
+      - HAE_API_KEY=${HAE_API_KEY:?Configura una clave administradora generada en .env}
+      - HAE_PORT=8000
+      - HAE_HOST=0.0.0.0
+      - HAE_DB_PATH=/app/data/hae_data.db
+    volumes:
+      - ./data:/app/data

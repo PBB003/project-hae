@@ -1,0 +1,24 @@
+{
+  "server_url": "http://localhost:8000",
+  "api_key": "",
+  "project": {
+    "id": "project-hae",
+    "name": "Project HAE",
+    "description": "Servidor de contexto, catálogo y memoria para agentes",
+    "tech_stack": "Python, FastAPI, SQLite, MCP, tree-sitter"
+  },
+  "repositories": [
+    {
+      "id": "project-hae",
+      "path": "."
+    }
+  ],
+  "rules": [
+    {
+      "title": "Verificar fuente y evidencia",
+      "rule_content": "Validar catálogo, recuperar el ticket completo y registrar pruebas y pendientes antes de cerrar una sesión.",
+      "category": "workflow",
+      "status": "proposed"
+    }
+  ]
+}

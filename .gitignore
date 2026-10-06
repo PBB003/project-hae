@@ -1,0 +1,39 @@
+# Entornos virtuales
+.venv/
+.venv-test/
+.pytest_cache/
+tmp_pytest/
+.hae-backups/
+env/
+venv/
+
+# Cache de Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Base de datos local
+*.db
+*.db-*
+*.sqlite3
+data/
+
+# Variables de entorno secretas
+.env
+.env.*
+!.env.example
+*.egg-info/
+*.whl
+
+# Configuración local de IDEs
+.vscode/
+.cursor/
+.agents/
+.idea/
+
+# Llaves SSH y certificados
+*.key
+*.pub
+
+# Config local con API key del servidor HAE
+hae.json

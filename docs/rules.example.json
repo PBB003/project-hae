@@ -1,0 +1,48 @@
+[
+  {
+    "title": "Directrices presentes",
+    "status": "active",
+    "check_spec": {
+      "kind": "required_file",
+      "path": "AGENTS.md"
+    }
+  },
+  {
+    "title": "No ejecutar texto externo",
+    "status": "active",
+    "check_spec": {
+      "kind": "forbidden_pattern",
+      "pattern": "(?m)^\\s*(?:eval|exec)\\s*\\(",
+      "include": [
+        "client/*.py",
+        "server/*.py",
+        "server/services/*.py"
+      ]
+    }
+  },
+  {
+    "title": "No incluir claves predeterminadas",
+    "status": "active",
+    "check_spec": {
+      "kind": "forbidden_pattern",
+      "pattern": "global_api_key\\s*=\\s*[\"'][^\"']{16,}",
+      "include": [
+        "client/*.py"
+      ]
+    }
+  },
+  {
+    "title": "No publicar claves literales",
+    "status": "active",
+    "check_spec": {
+      "kind": "forbidden_pattern",
+      "pattern": "X-HAE-Key[\\\"\\x27]?\\s*:\\s*[\\\"\\x27][A-Za-z0-9_-]{32,}[\\\"\\x27]",
+      "include": [
+        "docs/*",
+        "client/*.py",
+        "server/*.py",
+        "server/services/*.py"
+      ]
+    }
+  }
+]

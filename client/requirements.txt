@@ -1,0 +1,3 @@
+# Opcional pero recomendado: parser AST. Sin esto, hae_sync usa regex (menos preciso).
+tree-sitter>=0.25
+tree-sitter-typescript>=0.23

@@ -139,11 +139,11 @@ async def init_db():
             "components": {"repo_id": "TEXT NOT NULL DEFAULT 'legacy'", "branch": "TEXT NOT NULL DEFAULT ''",
                            "source_line": "INTEGER", "source_end_line": "INTEGER", "contract": "TEXT",
                            "type_dependencies": "TEXT NOT NULL DEFAULT '[]'", "unresolved_types": "TEXT NOT NULL DEFAULT '[]'",
-                           "type_resolution": "TEXT NOT NULL DEFAULT 'not_scanned'", "exported": "INTEGER"},
+                           "type_resolution": "TEXT NOT NULL DEFAULT 'not_scanned'", "relations": "TEXT NOT NULL DEFAULT '[]'", "exported": "INTEGER"},
             "utilities": {"repo_id": "TEXT NOT NULL DEFAULT 'legacy'", "branch": "TEXT NOT NULL DEFAULT ''",
                           "source_line": "INTEGER", "source_end_line": "INTEGER", "contract": "TEXT",
                           "type_dependencies": "TEXT NOT NULL DEFAULT '[]'", "unresolved_types": "TEXT NOT NULL DEFAULT '[]'",
-                          "type_resolution": "TEXT NOT NULL DEFAULT 'not_scanned'", "exported": "INTEGER"},
+                          "type_resolution": "TEXT NOT NULL DEFAULT 'not_scanned'", "relations": "TEXT NOT NULL DEFAULT '[]'", "exported": "INTEGER"},
             "session_logs": {"repo_id": "TEXT DEFAULT ''", "branch": "TEXT DEFAULT ''", "commit_sha": "TEXT DEFAULT ''",
                              "ticket_id": "TEXT DEFAULT ''", "agent": "TEXT DEFAULT ''", "evidence": "TEXT", "actor": "TEXT DEFAULT 'legacy'"},
             "meeting_notes": {"source_id": "TEXT", "updated_at": "TEXT"},
@@ -173,6 +173,22 @@ async def init_db():
                 await db.execute(f"CREATE INDEX idx_{table}_project ON {table}(project_id)")
 
         await db.executescript("""
+        CREATE TABLE IF NOT EXISTS symbol_relations (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            project_id TEXT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+            repo_id TEXT NOT NULL DEFAULT 'legacy',
+            branch TEXT NOT NULL DEFAULT '',
+            source_name TEXT NOT NULL,
+            source_file TEXT NOT NULL,
+            source_kind TEXT NOT NULL,
+            target_name TEXT NOT NULL,
+            target_file TEXT NOT NULL DEFAULT '',
+            relation_kind TEXT NOT NULL,
+            line INTEGER NOT NULL DEFAULT 0,
+            UNIQUE(project_id, repo_id, branch, source_file, source_name, relation_kind, target_name, target_file, line)
+        );
+        CREATE INDEX IF NOT EXISTS idx_symbol_relations_source ON symbol_relations(project_id, repo_id, branch, source_name);
+        CREATE INDEX IF NOT EXISTS idx_symbol_relations_target ON symbol_relations(project_id, repo_id, branch, target_name);
         CREATE TABLE IF NOT EXISTS repositories (
             project_id TEXT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
             repo_id TEXT NOT NULL, branch TEXT NOT NULL DEFAULT '', commit_sha TEXT NOT NULL DEFAULT '',

@@ -11,9 +11,16 @@ class TypeDependency(BaseModel):
     file_path: NonEmpty
     contract: NonEmpty
     source_line: Optional[int] = Field(None, ge=1)
+    source_end_line: Optional[int] = Field(None, ge=1)
     requested_as: Optional[str] = None
     exported: Optional[bool] = None
     kind: Literal['type','value'] = 'type'
+
+    @model_validator(mode="after")
+    def line_order(self):
+        if self.source_line is not None and self.source_end_line is not None and self.source_end_line < self.source_line:
+            raise ValueError("source_end_line debe ser posterior a source_line")
+        return self
 
     @field_validator("file_path")
     @classmethod
@@ -21,6 +28,23 @@ class TypeDependency(BaseModel):
         value = value.replace("\\", "/")
         if PurePosixPath(value).is_absolute() or ".." in PurePosixPath(value).parts or ":" in value:
             raise ValueError("file_path debe ser una ruta relativa sin ..")
+        return value
+
+
+class SymbolRelation(BaseModel):
+    target_name: NonEmpty
+    kind: Literal["renders", "calls", "uses_type"] = "calls"
+    target_file: Optional[str] = None
+    line: Optional[int] = Field(None, ge=1)
+
+    @field_validator("target_file")
+    @classmethod
+    def relative_target_path(cls, value):
+        if value is None or value == "":
+            return None
+        value = value.replace("\\", "/")
+        if PurePosixPath(value).is_absolute() or ".." in PurePosixPath(value).parts or ":" in value:
+            raise ValueError("target_file debe ser una ruta relativa sin ..")
         return value
 
 
@@ -33,6 +57,7 @@ class CatalogItem(BaseModel):
     type_dependencies: List[TypeDependency] = Field(default_factory=list)
     unresolved_types: List[str] = Field(default_factory=list)
     type_resolution: Literal["not_scanned", "partial", "complete"] = "not_scanned"
+    relations: List[SymbolRelation] = Field(default_factory=list)
     exported: Optional[bool] = None
     file_path: NonEmpty
 

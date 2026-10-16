@@ -45,8 +45,8 @@ def scan_codebase(root_dir: str, diagnostics=None) -> Tuple[List[Dict[str, Any]]
     
     ignore_dirs = {
         'node_modules', '.next', '.git', 'dist', 'build', 'out',
-        '.cache', '.vscode', '.cursor', '__pycache__', '.venv', 'env', 'venv',
-        'coverage', '.turbo', '.nuxt', '.svelte-kit'
+        '.cache', '.vscode', '.cursor', '__pycache__', '.venv', '.venv-test', 'env', 'venv',
+        'coverage', '.turbo', '.nuxt', '.svelte-kit', 'tmp_pytest', 'benchmarks', 'tests'
     }
     skip_markers = ('.test.', '.spec.', '.stories.', '.d.ts')
     max_file_bytes = 1_000_000
@@ -64,13 +64,16 @@ def scan_codebase(root_dir: str, diagnostics=None) -> Tuple[List[Dict[str, Any]]
         diagnostics["errors"].append({"path": str(Path(exc.filename).relative_to(root_path)), "reason": type(exc).__name__})
     for root, dirs, files in os.walk(root_path, onerror=walk_error):
         # Poda en memoria: NUNCA entra a node_modules, .next, .git, etc.
-        dirs[:] = [d for d in dirs if d not in ignore_dirs and not d.startswith('.') and not (Path(root) / d).is_symlink()]
+        dirs[:] = [d for d in dirs if d not in ignore_dirs and not d.startswith('.') and not d.endswith('.egg-info') and not (Path(root) / d).is_symlink()]
         
         for fname in files:
             ext = os.path.splitext(fname)[1].lower()
-            if ext not in ('.tsx', '.jsx', '.ts', '.js'):
+            if ext not in ('.tsx', '.jsx', '.ts', '.js', '.py'):
                 continue
-            if any(m in fname.lower() for m in skip_markers):
+            low_fname = fname.lower()
+            if any(m in low_fname for m in skip_markers):
+                continue
+            if ext == '.py' and (low_fname.startswith('test_') or low_fname.endswith('_test.py') or low_fname == 'conftest.py'):
                 continue
 
             full_path = os.path.join(root, fname)
@@ -93,6 +96,19 @@ def scan_codebase(root_dir: str, diagnostics=None) -> Tuple[List[Dict[str, Any]]
                 diagnostics["errors"].append({"path": rel_path, "reason": type(exc).__name__})
                 continue
             diagnostics["scanned_files"] += 1
+
+            if ext == '.py':
+                try:
+                    from client.python_parser import extract_python
+                except ImportError:
+                    from python_parser import extract_python
+                found_u, py_errors, py_meta = extract_python(content, rel_path)
+                if py_errors:
+                    diagnostics['errors'].extend({'path': rel_path, **err} for err in py_errors)
+                    continue
+                modules[rel_path] = py_meta
+                utilities.extend(found_u)
+                continue
 
             if ast_parser.AVAILABLE:
                 try:
@@ -184,8 +200,11 @@ def scan_codebase(root_dir: str, diagnostics=None) -> Tuple[List[Dict[str, Any]]
                         "type": "service" if "service" in rel_path.lower() else "util"
                     })
 
-    if ast_parser.AVAILABLE:
-        from client.type_resolver import TypeResolver
+    if ast_parser.AVAILABLE or modules:
+        try:
+            from client.type_resolver import TypeResolver
+        except ImportError:
+            from type_resolver import TypeResolver
         resolver = TypeResolver(root_path, modules)
         for item in components + utilities:
             resolver.enrich(item)

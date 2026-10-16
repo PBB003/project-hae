@@ -147,6 +147,10 @@ Este workspace usa HAE para mantener contexto, catálogo y memoria persistente.
 6. Usar `hae check` para reglas declarativas activas y ejecutar pruebas pertinentes. No declarar una regla textual como verificada automáticamente.
 7. Al cerrar un hito o chat, llamar `hae_save_session_log(project_id="{project_id}", ...)` con ticket, repositorio, rama, commit, agente, evidencia de pruebas y pendientes concretos.
 8. Sincronizar con manifiestos por repositorio y revisión. No enviar snapshots incompletos ni vacíos como eliminación implícita. No guardar claves reales en código ni bitácoras.
+9. Al reutilizar un símbolo con nombre y archivo conocidos, preferir `hae_get_symbol` o leer el fragmento exacto en la fuente usando `source_line` y `source_end_line`. Reservar la búsqueda para descubrir candidatos.
+10. Revisar `partial`, `budget`, `unresolved_types` y `type_resolution` antes de considerar completa una interfaz. `include_types=False` o `exclude_types=[...]` permiten omitir tipos ya conocidos.
+11. Enviar `if_none_match` solo si se conserva el contenido completo correspondiente al `etag` en el contexto o caché local.
+12. Antes de modificar la firma de un símbolo compartido o explorar sus dependencias, consultar `hae_get_symbol_graph` (`direction="incoming"` para impacto, `direction="outgoing"` para dependencias).
 """
     try:
         pdir = Path(project_dir)
@@ -350,7 +354,7 @@ def main():
                 catalog = []
             parser_status = __import__('client.ast_parser',fromlist=['AVAILABLE','INIT_ERROR'])
             print(json.dumps({"project_id":config['project']['id'],"repositories":[repo for repo,_ in repositories],
-                              "server":health,"catalog":catalog,"supported_sources":["TS","TSX","JS","JSX"],
+                              "server":health,"catalog":catalog,"supported_sources":["TS","TSX","JS","JSX","PY"],
                               "ast":parser_status.AVAILABLE,"ast_error":parser_status.INIT_ERROR},ensure_ascii=False,indent=2))
         except (ValueError,urllib.error.URLError) as exc:
             print(f"[Error] Doctor: {exc}")

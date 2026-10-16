@@ -19,6 +19,7 @@ api_router = APIRouter(prefix="/api")
 async def health_check():
     return {"status": "ok", "service": "HAE Context Server", "api_version": 2,
             "capabilities": ["repository_snapshots", "ranked_concept_search", "symbol_contracts",
+                             "symbol_graph", "ticket_guided_context",
                              "task_snapshots", "versioned_rules", "scoped_keys", "meeting_detail"]}
 
 
@@ -206,6 +207,20 @@ async def symbol_detail(project_id: str, name: str, repo_id: str | None = None, 
     if not symbols:
         raise HTTPException(404,"Símbolo no encontrado; una búsqueda vacía no prueba ausencia en el repositorio")
     return symbols
+
+
+@api_router.get("/projects/{project_id}/symbols/{name}/graph")
+async def symbol_graph(project_id: str, name: str, file_path: str | None = None,
+                       repo_id: str | None = None, branch: str | None = None,
+                       direction: str = "both", depth: int = Query(2, ge=1, le=5),
+                       max_tokens: int = Query(4096, ge=512, le=65536),
+                       if_none_match: str | None = None):
+    try:
+        return await RegistryService.get_symbol_graph(
+            project_id, name, file_path, repo_id, branch, direction, depth, max_tokens, if_none_match
+        )
+    except ValueError as exc:
+        raise HTTPException(422, str(exc))
 
 
 @api_router.get("/projects/{project_id}/rules")

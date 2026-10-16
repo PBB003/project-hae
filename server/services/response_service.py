@@ -37,6 +37,12 @@ def respond(payload, scope, max_tokens=4096, if_none_match=None):
             elif result.get('rules'):
                 result['rules'].pop()
                 omitted_results += 1
+            elif result.get('edges'):
+                result['edges'].pop()
+                omitted_results += 1
+            elif result.get('nodes'):
+                result['nodes'].pop()
+                omitted_results += 1
             else:
                 raise ValueError('Presupuesto insuficiente para los metadatos')
         elif rows[-1].get('types'):

@@ -91,6 +91,59 @@ def _has_jsx(node) -> bool:
     return False
 
 
+_JS_BUILTINS = {
+    "Array", "Boolean", "Date", "Error", "Function", "JSON", "Map", "Math", "Number",
+    "Object", "Promise", "RegExp", "Set", "String", "Symbol", "WeakMap", "WeakSet",
+    "BigInt", "console", "decodeURI", "decodeURIComponent", "encodeURI", "encodeURIComponent",
+    "eval", "fetch", "isFinite", "isNaN", "parseFloat", "parseInt", "require",
+    "setInterval", "setTimeout", "clearInterval", "clearTimeout", "queueMicrotask",
+    " structuredClone", "alert", "confirm",
+}
+_JS_GLOBAL_OBJECTS = {
+    "console", "JSON", "Math", "Object", "Array", "Promise", "Number", "String", "Date",
+    "RegExp", "Reflect", "Intl", "window", "document", "localStorage", "sessionStorage",
+    "navigator", "history", "location", "process", "React", "ReactDOM",
+}
+
+
+def _extract_runtime_relations(node, self_name: str, owner_class: Optional[str] = None) -> List[Dict[str, str]]:
+    renders, calls = set(), set()
+    stack = [node]
+    while stack:
+        n = stack.pop()
+        if n is None:
+            continue
+        if n.type in ("jsx_opening_element", "jsx_self_closing_element"):
+            name_node = n.child_by_field_name("name")
+            tag = _txt(name_node)
+            if tag:
+                root_tag = tag.split(".")[0]
+                if root_tag[:1].isupper() and root_tag != self_name and root_tag not in ("Fragment", "React"):
+                    renders.add(root_tag)
+        elif n.type == "call_expression":
+            fn_node = n.child_by_field_name("function")
+            if fn_node is not None:
+                if fn_node.type == "identifier":
+                    callee = _txt(fn_node)
+                    if callee and callee != self_name and callee not in _JS_BUILTINS and not callee.startswith("_"):
+                        calls.add(callee)
+                elif fn_node.type == "member_expression":
+                    obj = _txt(fn_node.child_by_field_name("object"))
+                    prop = _txt(fn_node.child_by_field_name("property"))
+                    if prop and not prop.startswith("_"):
+                        if obj == "this" and owner_class:
+                            target = f"{owner_class}.{prop}"
+                            if target != self_name:
+                                calls.add(target)
+                        elif _IDENT_RE.match(obj) and obj not in _JS_GLOBAL_OBJECTS:
+                            if obj[:1].isupper() or obj.lower().endswith(("service", "client", "api", "repo", "store")):
+                                calls.add(f"{obj}.{prop}")
+        stack.extend(n.children)
+    return ([{"target_name": r, "kind": "renders"} for r in sorted(renders)] +
+            [{"target_name": c, "kind": "calls"} for c in sorted(calls)])
+
+
+
 def _doc_for(node) -> str:
     prev = node.prev_sibling
     if prev is None or prev.type != "comment":
@@ -391,6 +444,14 @@ def extract(content: str, ext: str, rel_path: str, is_ui_file: bool,
                     referenced.add(_txt(current))
                 stack.extend(current.children)
             item["contract"] = "\n".join(decorators + [signature] + ([_txt(type_ann)] if type_ann else []) + [f"{name} = {types[name]}" for name in sorted(referenced)])
-            item['referenced_types'] = sorted(required_types - bound_types - {'__HAE_GENERIC__'})
+            refs_clean = sorted(required_types - bound_types - {'__HAE_GENERIC__'})
+            item['referenced_types'] = refs_clean
+            owner_cls = item["name"].split(".", 1)[0] if "." in item["name"] else None
+            runtime_rels = _extract_runtime_relations(fn, item["name"], owner_cls)
+            type_rels = [{"target_name": r.replace("typeof ", "").strip(), "kind": "uses_type"}
+                         for r in refs_clean if r.replace("typeof ", "").strip() and r.replace("typeof ", "").strip() != item["name"]]
+            item["relations"] = runtime_rels + type_rels
+        elif "relations" not in item:
+            item["relations"] = []
 
     return components, utilities

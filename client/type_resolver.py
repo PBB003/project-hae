@@ -56,7 +56,7 @@ def node_references(nodes):
 
 def module_info(content, extension, items):
     tree = ast_parser._parser_for(extension).parse(content.encode())
-    info = {'imports': {}, 'types': {}, 'exports': {}, 'stars': []}
+    info = {'imports': {}, 'types': {}, 'exports': {}, 'stars': [], 'symbols': {x['name'] for x in items}}
     indexed = {x['name']: x['contract'] for x in items if x.get('type') == 'class' and x.get('contract')}
     for outer in tree.root_node.named_children:
         source = outer.child_by_field_name('source')
@@ -104,7 +104,7 @@ def module_info(content, extension, items):
                 name = ast_parser._txt(name)
                 info['types'][name] = {'name':name,'contract':'const '+ast_parser._txt(entry)+';',
                     'file_path':items[0]['file_path'] if items else '', 'source_line':entry.start_point.row+1,
-                    'refs':[], 'kind':'value'}
+                    'source_end_line':entry.end_point.row+1, 'refs':[], 'kind':'value'}
                 if exported:
                     info['exports'][name] = (None,name)
             continue
@@ -138,7 +138,8 @@ def module_info(content, extension, items):
                     nodes.append(member.child_by_field_name('type'))
             refs = node_references(nodes) | parents
         info['types'][name] = {'name': name, 'contract': text, 'file_path': items[0]['file_path'] if items else '',
-                               'source_line': node.start_point.row + 1, 'refs': sorted(refs - {name})}
+                               'source_line': node.start_point.row + 1, 'source_end_line': node.end_point.row + 1,
+                               'refs': sorted(refs - {name})}
         if exported:
             public = 'default' if any(c.type == 'default' for c in outer.children) else name
             info['exports'][public] = (None, name)
@@ -244,8 +245,9 @@ class TypeResolver:
             variants = [candidate]
             if candidate.suffix in ('.js', '.jsx'):
                 variants.extend(candidate.with_suffix(ext) for ext in ('.ts', '.tsx'))
-            variants.extend(Path(str(candidate) + ext) for ext in ('.ts', '.tsx', '.js', '.jsx'))
+            variants.extend(Path(str(candidate) + ext) for ext in ('.ts', '.tsx', '.js', '.jsx', '.py'))
             variants.extend(candidate / ('index' + ext) for ext in ('.ts', '.tsx', '.js', '.jsx'))
+            variants.append(candidate / '__init__.py')
             for variant in variants:
                 key = variant.relative_to(self.root).as_posix()
                 if key in self.modules:
@@ -317,11 +319,49 @@ class TypeResolver:
             for child in declaration['refs']:
                 visit(target[0], child, depth + 1)
         explicit = item.pop('referenced_types', None)
-        refs = set(explicit) if explicit is not None else references(item.get('contract') or item.get('signature') or item.get('props_summary') or '')
-        if item.get('type') in ('type','class','constant') and item['name'] in self.modules[owner]['types']:
+        if explicit is not None:
+            refs = set(explicit)
+        elif not owner.endswith('.py') and ast_parser.AVAILABLE:
+            refs = references(item.get('contract') or item.get('signature') or item.get('props_summary') or '')
+        else:
+            refs = set()
+        if item.get('type') in ('type','class','constant') and item['name'] in self.modules.get(owner, {}).get('types', {}):
             refs = {item['name']}
         for ref in sorted(refs):
             visit(owner, ref)
         item['type_dependencies'] = sorted(dependencies.values(), key=lambda x: (x['file_path'], x['name']))
         item['unresolved_types'] = sorted(unresolved)
         item['type_resolution'] = 'partial' if unresolved else 'complete'
+
+        # Resolver archivos destino para aristas del grafo de símbolos (renders, calls, uses_type)
+        dep_by_name = {dep['name']: dep['file_path'] for dep in item['type_dependencies']}
+        for dep in item['type_dependencies']:
+            if dep.get('requested_as'):
+                dep_by_name[dep['requested_as']] = dep['file_path']
+        module = self.modules.get(owner, {'imports': {}, 'types': {}, 'symbols': set()})
+        local_symbols = set(module.get('symbols', set())) | set(module.get('types', {}).keys())
+        enriched_relations = {}
+        for rel in item.get('relations', []):
+            tname = rel.get('target_name', '').strip()
+            rkind = rel.get('kind') or rel.get('relation', '')
+            if not tname or not rkind:
+                continue
+            if rkind == 'uses_type' and tname in BUILTINS:
+                continue
+            tfile = rel.get('target_file') or ''
+            if not tfile:
+                base_alias = tname.split('.', 1)[0]
+                if tname in dep_by_name:
+                    tfile = dep_by_name[tname]
+                elif tname in local_symbols or base_alias in local_symbols:
+                    tfile = owner
+                elif base_alias in module.get('imports', {}):
+                    source, public = module['imports'][base_alias]
+                    other = self.module_path(owner, source)
+                    if other:
+                        resolved_exp = self.exported(other, public)
+                        tfile = resolved_exp[0] if resolved_exp else other
+            key = (rkind, tname, tfile)
+            enriched_relations[key] = {'target_name': tname, 'kind': rkind, **({'target_file': tfile} if tfile else {})}
+        item['relations'] = sorted(enriched_relations.values(), key=lambda r: (r['kind'], r['target_name'], r.get('target_file', '')))
+

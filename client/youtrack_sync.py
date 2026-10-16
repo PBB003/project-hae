@@ -28,7 +28,7 @@ def load_youtrack_config():
                 "yt_token": yt.get("token", ""),
                 "default_project": yt.get("default_project", "TSO"),
                 "user_id": yt.get("user_id"),
-                "hae_project_id": yt.get("hae_project_id", "tekniek")
+                "hae_project_id": yt.get("hae_project_id", "mi-proyecto")
             }
         except Exception:
             pass
@@ -76,12 +76,12 @@ def issue_to_task(issue, user_id, base_url, fallback_mine=False):
             "resolved_at":issue.get("resolved"),"source_updated_at":issue.get("updated")}
 
 
-def sync_youtrack_to_hae(project_id: str = "tekniek", custom_query: str = None):
+def sync_youtrack_to_hae(project_id: str = "project-hae", custom_query: str = None):
     cfg = load_youtrack_config()
     if not cfg or not cfg.get("yt_token"):
         print("[Error] No se encontraron credenciales de YouTrack en ~/.hae.json")
         return False
-    if project_id != cfg.get("hae_project_id", "tekniek"):
+    if project_id != cfg.get("hae_project_id", "project-hae"):
         print("[Error] El proyecto HAE no coincide con el mapeo YouTrack; corrige youtrack.hae_project_id")
         return False
     observed_at = datetime.now(timezone.utc).isoformat()
@@ -139,7 +139,7 @@ def sync_youtrack_to_hae(project_id: str = "tekniek", custom_query: str = None):
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description="Sincronizador YouTrack -> HAE")
-    parser.add_argument("--project",default="tekniek")
+    parser.add_argument("--project",default="project-hae")
     parser.add_argument("--query",default=None)
     args = parser.parse_args()
     raise SystemExit(0 if sync_youtrack_to_hae(args.project,args.query) else 1)

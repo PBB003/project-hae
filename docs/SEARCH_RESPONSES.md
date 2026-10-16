@@ -12,7 +12,7 @@ Ejemplo de argumentos MCP:
 
 ```json
 {
-  "project_id": "tekniek",
+  "project_id": "mi-proyecto",
   "query": "Checkbox",
   "repo_id": "frontend",
   "branch": "main",

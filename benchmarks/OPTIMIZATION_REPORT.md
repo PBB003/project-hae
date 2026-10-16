@@ -44,8 +44,8 @@ Escaneo: 602 archivos frontend y 722 backend sin cierre nativo; sigue un fallo A
 ## Reproducir
 
 ```powershell
-.\.venv-test\Scripts\python.exe -m benchmarks.token_efficiency --workspace 'C:\Users\pedro\Desktop\Tekniek' --mode legacy --output benchmarks/results/token_efficiency_legacy_rerun.json
-.\.venv-test\Scripts\python.exe -m benchmarks.token_efficiency --workspace 'C:\Users\pedro\Desktop\Tekniek' --mode optimized
+.\.venv-test\Scripts\python.exe -m benchmarks.token_efficiency --workspace 'C:\ruta\a\tu-workspace' --mode legacy --output benchmarks/results/token_efficiency_legacy_rerun.json
+.\.venv-test\Scripts\python.exe -m benchmarks.token_efficiency --workspace 'C:\ruta\a\tu-workspace' --mode optimized
 ```
 
 Instalar antes benchmarks/requirements.txt en el entorno de pruebas si falta tiktoken. El benchmark usa una base temporal y no modifica ni publica código del consumidor. El JSON guarda hashes y conteos, sin credenciales ni fuente cruda.

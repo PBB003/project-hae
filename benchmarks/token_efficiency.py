@@ -138,7 +138,10 @@ def main():
     args = parser.parse_args()
     workspace = Path(args.workspace).resolve()
     os.environ.setdefault('TIKTOKEN_CACHE_DIR',str(Path(__file__).resolve().parents[1]/'.hae-cache'/'tiktoken'))
-    roots = {'frontend': workspace/'tekniek-frontend', 'backend': workspace/'tekniek-backend'}
+    roots = {
+        'frontend': next((p for p in [workspace/'frontend', *workspace.glob('*-frontend')] if p.is_dir()), workspace/'frontend'),
+        'backend': next((p for p in [workspace/'backend', *workspace.glob('*-backend')] if p.is_dir()), workspace/'backend'),
+    }
     encodings = {name: tiktoken.get_encoding(name) for name in ('o200k_base', 'cl100k_base')}
     scans = {}
     for repo_id, root in roots.items():
@@ -148,7 +151,7 @@ def main():
         scans[repo_id] = (components, utilities, diagnostics)
     result = {'measured_at_utc': datetime.now(timezone.utc).isoformat(), 'tiktoken_version': importlib.metadata.version('tiktoken'),
         'mode': args.mode, 'hae_lookup_calls': len(CASES)*(2 if args.mode == 'legacy' else 1),
-        'scope': 'Recuperación de interfaces de 7 símbolos preseleccionados de archivos reales de Tekniek',
+        'scope': 'Recuperación de interfaces de 7 símbolos preseleccionados de archivos reales de un workspace fullstack',
         'method': 'Textos de argumentos/respuestas MCP, contexto inicial una vez, fuente completa o declaración dirigida; sin generación de código ni facturación',
         'scan': {repo: {'components': len(c), 'utilities': len(u), **d} for repo, (c,u,d) in scans.items()}, 'cases': [], 'totals': {}}
     original = settings.API_KEY, settings.DB_PATH
@@ -162,15 +165,15 @@ def main():
                 headers = {'X-HAE-Key': settings.API_KEY}
                 for repo_id, root in roots.items():
                     components, utilities, diagnostics = scans[repo_id]
-                    payload = {'project': {'id': 'benchmark-tekniek', 'name': 'Tekniek benchmark', 'tech_stack': 'React, TypeScript, NestJS'},
+                    payload = {'project': {'id': 'benchmark-fullstack', 'name': 'Fullstack benchmark', 'tech_stack': 'React, TypeScript, NestJS'},
                         'repository': {'repo_id': repo_id, **git_metadata(root), 'scanned_at': datetime.now(timezone.utc).isoformat(),
                             'complete': not diagnostics['errors']}, 'mode': 'snapshot' if not diagnostics['errors'] else 'merge',
                         'components': components, 'utilities': utilities}
                     client.post('/api/sync', headers=headers, json=payload).raise_for_status()
-                context = asyncio.run(mcp.hae_get_project_context('benchmark-tekniek'))
-                context_payload = serialized({'name': 'hae_get_project_context', 'arguments': {'project_id': 'benchmark-tekniek'}})+context
+                context = asyncio.run(mcp.hae_get_project_context('benchmark-fullstack'))
+                context_payload = serialized({'name': 'hae_get_project_context', 'arguments': {'project_id': 'benchmark-fullstack'}})+context
                 if args.mode == 'advanced':
-                    initial_context_args = {'project_id':'benchmark-tekniek','if_none_match':''}
+                    initial_context_args = {'project_id':'benchmark-fullstack','if_none_match':''}
                     initial_context = json.loads(asyncio.run(mcp.hae_get_project_context(**initial_context_args)))
                     context_payload = serialized({'name':'hae_get_project_context','arguments':initial_context_args})+serialized(initial_context)
                     warm_context_args = {**initial_context_args,'if_none_match':initial_context['etag']}
@@ -184,19 +187,19 @@ def main():
                     path = roots[repo_id]/file
                     source = path.read_text(encoding='utf-8-sig')
                     extras = '\n'.join((roots[repo_id]/extra).read_text(encoding='utf-8-sig') for extra in extra_files)
-                    query_args = {'project_id': 'benchmark-tekniek', 'query': name, 'limit': 1, 'repo_id': repo_id}
+                    query_args = {'project_id': 'benchmark-fullstack', 'query': name, 'limit': 1, 'repo_id': repo_id}
                     from server.services.registry_service import RegistryService
                     if args.mode in ('legacy','optimized'):
                         service_search = RegistryService.search_components if kind == 'component' else RegistryService.search_utilities
                         if args.mode == 'legacy':
-                            lookup = legacy_search_response(kind, 'benchmark-tekniek', asyncio.run(service_search(**query_args)))
-                            detail_args = {'project_id': 'benchmark-tekniek', 'name': name, 'repo_id': repo_id}
+                            lookup = legacy_search_response(kind, 'benchmark-fullstack', asyncio.run(service_search(**query_args)))
+                            detail_args = {'project_id': 'benchmark-fullstack', 'name': name, 'repo_id': repo_id}
                             rows=[]
                             for lookup_search in (RegistryService.search_components,RegistryService.search_utilities):
-                                rows.extend(legacy_row(x) for x in asyncio.run(lookup_search('benchmark-tekniek',name,limit=50,repo_id=repo_id)) if x['name']==name)
+                                rows.extend(legacy_row(x) for x in asyncio.run(lookup_search('benchmark-fullstack',name,limit=50,repo_id=repo_id)) if x['name']==name)
                             detail=json.dumps(rows,ensure_ascii=False)
                         else:
-                            hits=asyncio.run(service_search('benchmark-tekniek',name,limit=50,repo_id=repo_id))
+                            hits=asyncio.run(service_search('benchmark-fullstack',name,limit=50,repo_id=repo_id))
                             exact=[x for x in hits if x['name']==name]
                             if len(exact)!=1:
                                 raise ValueError('Baseline fase 2 no es único')
@@ -238,7 +241,7 @@ def main():
                         if not json.loads(warm).get('not_modified'):
                             raise ValueError(f'El símbolo sin cambios no se reutiliza: {name}')
                         warm_payload=serialized({'name':'hae_search_'+('components' if kind=='component' else 'utilities'),'arguments':warm_args})+warm
-                        direct_args={'project_id':'benchmark-tekniek','name':name,'file_path':file,'repo_id':repo_id,'max_tokens':16384}
+                        direct_args={'project_id':'benchmark-fullstack','name':name,'file_path':file,'repo_id':repo_id,'max_tokens':16384}
                         direct=asyncio.run(mcp.hae_get_symbol(**direct_args))
                         if json.loads(direct)['results'][0]['contract']!=expected[0]['contract']:
                             raise ValueError(f'Consulta directa incorrecta: {name}')

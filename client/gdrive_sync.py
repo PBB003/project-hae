@@ -153,7 +153,7 @@ def _sync_google_meetings_to_hae(project_id: str):
         title = file["name"]
         link = file.get("webViewLink", "")
         
-        # Filtrar si corresponde al proyecto (ej: 'tekniek' en el título o coincide el ID)
+        # Filtrar si corresponde al proyecto (ej: 'mi-proyecto' en el título o coincide el ID)
         if project_id.lower() not in title.lower():
             continue
 
@@ -196,7 +196,7 @@ def _sync_google_meetings_to_hae(project_id: str):
     return not failed
 
 
-def sync_google_meetings_to_hae(project_id: str = "tekniek"):
+def sync_google_meetings_to_hae(project_id: str = "mi-proyecto"):
     try:
         return _sync_google_meetings_to_hae(project_id)
     except Exception as exc:
@@ -206,6 +206,6 @@ def sync_google_meetings_to_hae(project_id: str = "tekniek"):
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description="Sincronizador Google Drive / Gemini Notes -> HAE")
-    parser.add_argument("--project", default="tekniek", help="ID del proyecto HAE")
+    parser.add_argument("--project", default="mi-proyecto", help="ID del proyecto HAE")
     args = parser.parse_args()
     raise SystemExit(0 if sync_google_meetings_to_hae(args.project) else 1)

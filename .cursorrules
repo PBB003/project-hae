@@ -1,5 +1,5 @@
 # Directrices de Agente IA (Project HAE)
-Este workspace mantiene el servidor HAE. Su proyecto es `project-hae`; Tekniek y otros productos tienen contextos independientes.
+Este workspace mantiene el servidor HAE. Su proyecto es `project-hae`; cada producto externo mantiene su propio contexto independiente.
 
 ## Reglas obligatorias
 1. Al iniciar, consultar `hae_get_project_context(project_id="project-hae")`. Validar proyecto, repositorio, rama, commit y vigencia antes de implementar. Si el índice está desactualizado o incompleto, sincronizar o verificar directamente el repositorio.

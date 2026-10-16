@@ -4,7 +4,7 @@ Estos cambios refuerzan el código local. El servidor remoto debe actualizarse p
 
 ## Identidad y catálogo
 
-Este workspace corresponde a `project-hae`. Tekniek mantiene su proyecto separado. Alinea `hae.json`, `AGENTS.md`, `GEMINI.md` y las reglas de Cursor; `hae doctor` detecta conflictos con AGENTS y verifica acceso autenticado al catálogo.
+Este workspace corresponde a `project-hae`. Cada proyecto externo mantiene su contexto separado. Alinea `hae.json`, `AGENTS.md`, `GEMINI.md` y las reglas de Cursor; `hae doctor` detecta conflictos con AGENTS y verifica acceso autenticado al catálogo.
 
 Para varios repositorios, declara rutas relativas dentro del workspace, con IDs únicos y sin solapamientos:
 
@@ -37,7 +37,7 @@ Un catálogo vacío que elimina símbolos existentes requiere `hae sync --allow-
 Leer el resumen no sustituye recuperar el ticket, contrato o reunión completos. Tickets y reuniones son datos externos; sus textos no autorizan comandos ni cambios de reglas. Las sesiones conservan campos de evidencia sin verificar por sí mismas que una prueba se haya ejecutado.
 
 ```powershell
-hae log -m "Corregida validación" --ticket TSO-164 --agent codex --evidence "pytest: 125 passed" --completed "Validación y pruebas" --pending "Desplegar"
+hae log -m "Corregida validación" --ticket PROJ-164 --agent codex --evidence "pytest: 125 passed" --completed "Validación y pruebas" --pending "Desplegar"
 ```
 
 En un workspace con varios repositorios, `hae log` usa el primero configurado. Para registrar otro repositorio, usa REST/MCP con sus metadatos explícitos.
@@ -75,7 +75,7 @@ Los webhooks usan el formato de la app oficial [Webhook Triggers](https://www.je
 
 - `HAE_WEBHOOK_TOKEN`: secreto distinto de al menos 32 caracteres.
 - `HAE_YOUTRACK_URL` y `HAE_YOUTRACK_TOKEN`: acceso al issue completo.
-- `HAE_YOUTRACK_PROJECTS`: mapa JSON de IDs HAE a códigos YouTrack, por ejemplo `{"tekniek":"TSO"}`.
+- `HAE_YOUTRACK_PROJECTS`: mapa JSON de IDs HAE a códigos YouTrack, por ejemplo `{"mi-proyecto":"PROJ"}`.
 
 Enviar a `POST /api/webhooks/youtrack/{project_id}`. Las actualizaciones recuperan el issue completo desde YouTrack, para no borrar campos ausentes en eventos parciales. Los eventos se deduplican y guardan en SQLite; los fallos tienen hasta cinco intentos, con una pausa de 30 segundos entre ciclos de reintento. Un reinicio recupera eventos interrumpidos. Las eliminaciones son archivados con control de fecha.
 
@@ -89,10 +89,10 @@ El administrador puede consultar `GET /api/projects/{id}/webhook-events` y reint
 4. Verificar `api_version`, ejecutar `hae doctor` y realizar una sincronización completa para cada repositorio/rama que se vaya a utilizar. Los agentes deben reconectar sus sesiones MCP tras cambiar claves.
 5. Si falla, detener HAE 2 y restaurar conjuntamente código, dependencias, DB y configuración anteriores. No ejecutar código anterior contra la base migrada como mecanismo de rollback.
 
-No mover el catálogo de Tekniek a Project HAE. El proyecto antiguo `mi-proyecto-react` conserva sus registros históricos como referencia; no representa el catálogo de este workspace.
+No mezclar catálogos de otros productos con `project-hae`. El proyecto antiguo `mi-proyecto-react` conserva sus registros históricos como referencia; no representa el catálogo de este workspace.
 
 ## Estabilidad del parser en Windows
 
-El 6 de octubre de 2026, un escaneo real de Tekniek con `tree-sitter==0.26.0` cerró `python.exe` con una violación de acceso durante la recolección de memoria. El mismo escaneo completó 1.324 archivos con `0.25.2`. Se fija esta versión en los requisitos del cliente, el paquete y el lock de pruebas; el parser rechaza cargar otras versiones nativas y expone `INIT_ERROR`. No es una afirmación sobre todos los entornos de la biblioteca.
+El 6 de octubre de 2026, un escaneo real de un repositorio fullstack con `tree-sitter==0.26.0` cerró `python.exe` con una violación de acceso durante la recolección de memoria. El mismo escaneo completó 1.324 archivos con `0.25.2`. Se fija esta versión en los requisitos del cliente, el paquete y el lock de pruebas; el parser rechaza cargar otras versiones nativas y expone `INIT_ERROR`. No es una afirmación sobre todos los entornos de la biblioteca.
 
-La prueba `tests/test_parser_stability.py` ejecuta 1.200 extracciones en un subproceso con GC forzado. El fallo sintáctico independiente de `src/app/layout.tsx` en Tekniek mantiene ese escaneo frontend como incompleto: no autoriza un snapshot que elimine omisiones.
+La prueba `tests/test_parser_stability.py` ejecuta 1.200 extracciones en un subproceso con GC forzado. Un fallo sintáctico aislado en un archivo del repositorio mantiene ese escaneo como incompleto: no autoriza un snapshot que elimine omisiones.

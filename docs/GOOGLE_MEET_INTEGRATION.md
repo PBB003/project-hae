@@ -19,10 +19,10 @@ hae google
 O indica explícitamente el proyecto al ejecutar el módulo:
 
 ```powershell
-python -m client.gdrive_sync --project tekniek
+python -m client.gdrive_sync --project mi-proyecto
 ```
 
-El cliente pagina documentos cuyo título contiene `Daily` y filtra el ID del proyecto en el título. Se recomienda `Daily - tekniek: YYYY-MM-DD - Notas de Gemini`. Los encabezados `Resumen`, `Resumen ejecutivo`, `Próximos pasos`, `Elementos de acción` y sus variantes inglesas separan resumen y acciones. La estructura inesperada requiere revisar el original; la extracción no interpreta obligaciones ni responsables.
+El cliente pagina documentos cuyo título contiene `Daily` y filtra el ID del proyecto en el título. Se recomienda `Daily - mi-proyecto: YYYY-MM-DD - Notas de Gemini`. Los encabezados `Resumen`, `Resumen ejecutivo`, `Próximos pasos`, `Elementos de acción` y sus variantes inglesas separan resumen y acciones. La estructura inesperada requiere revisar el original; la extracción no interpreta obligaciones ni responsables.
 
 No se truncan notas, resumen ni acciones al guardar. El contexto inicial presenta una vista compacta; `hae_get_meeting_detail(project_id, note_id)` o `GET /api/projects/{id}/meetings/{note_id}` recupera el registro completo.
 

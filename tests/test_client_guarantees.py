@@ -168,10 +168,10 @@ def test_google_paginates_filters_and_saves_full_original(google_client):
     drive, docs, network = google_client
     drive.files().list().execute.side_effect = [
         {'nextPageToken': 'page-2', 'files': [{'id': 'unrelated', 'name': 'Daily - other'}]},
-        {'files': [{'id': 'doc-1', 'name': 'Daily - tekniek 2026-10-05', 'webViewLink': 'https://docs.invalid/doc-1'}]}]
+        {'files': [{'id': 'doc-1', 'name': 'Daily - mi-proyecto 2026-10-05', 'webViewLink': 'https://docs.invalid/doc-1'}]}]
     original = 'Resumen ejecutivo\n' + 'Resumen completo\n'*1000 + 'Próximos pasos\nAcción uno\nAcción dos'
     docs.documents().get().execute.return_value = {'body': {'content': [{'paragraph': {'elements': [{'textRun': {'content': original}}]}}]}}
-    assert gdrive_sync.sync_google_meetings_to_hae('tekniek') is True
+    assert gdrive_sync.sync_google_meetings_to_hae('mi-proyecto') is True
     assert network.call_count == 1
     payload = json.loads(network.call_args.args[0].data)
     assert payload['source_id'] == 'doc-1' and payload['raw_notes'] == original
@@ -182,7 +182,7 @@ def test_google_paginates_filters_and_saves_full_original(google_client):
 def test_google_returns_failure_for_unrelated_documents_or_fetch_error(google_client):
     drive, docs, network = google_client
     drive.files().list().execute.return_value = {'files': [{'id': 'other', 'name': 'Daily - other'}]}
-    assert gdrive_sync.sync_google_meetings_to_hae('tekniek') is False
+    assert gdrive_sync.sync_google_meetings_to_hae('mi-proyecto') is False
     network.assert_not_called()
     drive.files().list().execute.side_effect = TimeoutError('Unavailable')
-    assert gdrive_sync.sync_google_meetings_to_hae('tekniek') is False
+    assert gdrive_sync.sync_google_meetings_to_hae('mi-proyecto') is False

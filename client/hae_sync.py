@@ -381,7 +381,7 @@ def main():
             from youtrack_sync import sync_youtrack_to_hae
         except ImportError:
             from client.youtrack_sync import sync_youtrack_to_hae
-        if not sync_youtrack_to_hae(config.get("project", {}).get("id", "tekniek")):
+        if not sync_youtrack_to_hae(config.get("project", {}).get("id", "project-hae")):
             sys.exit(1)
         return
 
@@ -390,7 +390,7 @@ def main():
             from gdrive_sync import sync_google_meetings_to_hae
         except ImportError:
             from client.gdrive_sync import sync_google_meetings_to_hae
-        if not sync_google_meetings_to_hae(config.get("project", {}).get("id", "tekniek")):
+        if not sync_google_meetings_to_hae(config.get("project", {}).get("id", "project-hae")):
             sys.exit(1)
         return
 
@@ -399,7 +399,7 @@ def main():
         if not msg:
             print("[❌] Debes especificar un resumen con -m 'Resumen de la reunión'")
             sys.exit(1)
-        pid = config.get("project", {}).get("id", "tekniek")
+        pid = config.get("project", {}).get("id", "project-hae")
         surl = config.get("server_url", "https://129.213.16.122.sslip.io").rstrip("/")
         ep = f"{surl}/api/projects/{pid}/meetings"
         pdata = json.dumps({
@@ -484,8 +484,8 @@ def main():
     except ImportError:
         from client.youtrack_sync import sync_youtrack_to_hae, load_youtrack_config
     yt_cfg = load_youtrack_config()
-    if yt_cfg and yt_cfg.get("yt_token") and config["project"]["id"] == yt_cfg.get("hae_project_id", "tekniek"):
-        if not sync_youtrack_to_hae(config.get("project", {}).get("id", "tekniek")):
+    if yt_cfg and yt_cfg.get("yt_token") and config["project"]["id"] == yt_cfg.get("hae_project_id", "project-hae"):
+        if not sync_youtrack_to_hae(config.get("project", {}).get("id", "project-hae")):
             sys.exit(1)
 
 

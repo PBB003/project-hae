@@ -56,7 +56,7 @@ El cliente solo debe enviar if_none_match mientras conserve el contenido anterio
 ## Reproducir
 
 ```powershell
-.\.venv-test\Scripts\python.exe -m benchmarks.token_efficiency --workspace 'C:\Users\pedro\Desktop\Tekniek' --mode advanced
+.\.venv-test\Scripts\python.exe -m benchmarks.token_efficiency --workspace 'C:\ruta\a\tu-workspace' --mode advanced
 ```
 
 Instalar previamente benchmarks/requirements.txt si falta tiktoken. Se conservan los modos legacy y optimized para repetir los formatos anteriores; usar --output con un nombre nuevo para no reemplazar artefactos históricos.

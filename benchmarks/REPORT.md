@@ -1,4 +1,4 @@
-# Medición de tokens de HAE con Tekniek
+# Medición de tokens de HAE en proyecto fullstack
 
 Fecha: 6 de octubre de 2026. Resultado reproducible: [JSON de conteos y hashes](results/token_efficiency.json). Script: [token_efficiency.py](token_efficiency.py).
 
@@ -35,7 +35,7 @@ Estas filas excluyen el contexto inicial y los esquemas. Un ahorro negativo repr
 
 ## Método y límites
 
-Se escanearon 602 archivos frontend y 722 backend del workspace local Tekniek, sin modificar sus fuentes ni enviarlas a un servicio externo. Se poblaron una SQLite temporal y el servidor HAE local mediante TestClient. Se contaron cadenas de argumentos y respuestas reales de las funciones MCP, no una ejecución de un agente programando. El tokenizador es [tiktoken](https://github.com/openai/tiktoken), versión 0.14.0, con o200k_base y cl100k_base; no se presupone un modelo concreto ni equivalencia exacta con facturación.
+Se escanearon 602 archivos frontend y 722 backend de un workspace fullstack local, sin modificar sus fuentes ni enviarlas a un servicio externo. Se poblaron una SQLite temporal y el servidor HAE local mediante TestClient. Se contaron cadenas de argumentos y respuestas reales de las funciones MCP, no una ejecución de un agente programando. El tokenizador es [tiktoken](https://github.com/openai/tiktoken), versión 0.14.0, con o200k_base y cl100k_base; no se presupone un modelo concreto ni equivalencia exacta con facturación.
 
 Los siete nombres se eligieron antes de la medición. Las búsquedas usan límite uno, repositorio y nombre conocidos, y verifican que el detalle corresponda al archivo esperado. Esta selección favorece la recuperación conocida y no mide precisión de consultas ambiguas. Se contabilizan búsqueda y detalle por cada símbolo; el cliente podría ahorrar omitiendo llamadas redundantes.
 
@@ -57,7 +57,7 @@ Desde la raíz de Project HAE, con el entorno de pruebas instalado:
 
 ```powershell
 .\.venv-test\Scripts\python.exe -m pip install -r benchmarks/requirements.txt
-.\.venv-test\Scripts\python.exe -m benchmarks.token_efficiency --workspace 'C:\Users\pedro\Desktop\Tekniek' --mode legacy --output benchmarks/results/token_efficiency_legacy_rerun.json
+.\.venv-test\Scripts\python.exe -m benchmarks.token_efficiency --workspace 'C:\ruta\a\tu-workspace' --mode legacy --output benchmarks/results/token_efficiency_legacy_rerun.json
 ```
 
 El tokenizador puede descargar vocabularios en la primera ejecución. Su caché vive en .hae-cache/tiktoken y está excluida del repositorio y Docker. El JSON conserva hashes de las fuentes y conteos, sin código crudo ni credenciales.

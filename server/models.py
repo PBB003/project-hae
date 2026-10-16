@@ -164,7 +164,7 @@ class SessionLogItem(BaseModel):
     created_at: Optional[str] = None
 
 class MeetingNoteCreate(BaseModel):
-    title: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)] = Field(..., description="Título de la reunión (ej: Daily - tekniek)")
+    title: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)] = Field(..., description="Título de la reunión (ej: Daily - mi-proyecto)")
     meeting_date: Optional[str] = Field(None, description="Fecha de la reunión (YYYY-MM-DD)")
     summary: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)] = Field(..., description="Resumen ejecutivo de los temas y acuerdos")
     action_items: Optional[str] = Field(None, description="Tareas o acuerdos técnicos concretos")

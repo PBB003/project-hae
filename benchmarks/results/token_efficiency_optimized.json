@@ -3,7 +3,7 @@
   "tiktoken_version": "0.14.0",
   "mode": "optimized",
   "hae_lookup_calls": 7,
-  "scope": "Recuperación de interfaces de 7 símbolos preseleccionados de archivos reales de Tekniek",
+  "scope": "Recuperación de interfaces de 7 símbolos preseleccionados de archivos reales de un workspace fullstack",
   "method": "Textos de argumentos/respuestas MCP, contexto inicial una vez, fuente completa o declaración dirigida; sin generación de código ni facturación",
   "scan": {
     "frontend": {

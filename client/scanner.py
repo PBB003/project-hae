@@ -300,7 +300,7 @@ def detect_project_info(root_dir: str) -> Dict[str, Any]:
         except Exception:
             pass
 
-    # 2. Caso Multi-repo / Monorepo: buscar subcarpetas (ej: tekniek-frontend, tekniek-backend, apps/*)
+    # 2. Caso Multi-repo / Monorepo: buscar subcarpetas (ej: frontend, backend, apps/*)
     subproject_stacks = []
     subfolder_names = []
     ignore_subdirs = {'node_modules', '.git', 'dist', 'build', '.next', '.venv'}

@@ -74,7 +74,7 @@ En Linux/macOS, usa `.venv/bin/python` y `.venv/bin/hae`. También puedes ejecut
 
 - [Garantías, migración y operación de HAE 2](docs/HARDENING.md)
 - [Pruebas y sus límites](docs/TESTING.md)
-- [Medición de tokens con código real de Tekniek](benchmarks/REPORT.md)
+- [Medición de tokens en un proyecto fullstack](benchmarks/REPORT.md)
 - [Optimización de búsquedas y benchmark antes/después](benchmarks/OPTIMIZATION_REPORT.md)
 - [Acceso directo, tipos selectivos, validadores y presupuestos](benchmarks/ADVANCED_REPORT.md)
 - [Niveles de respuesta MCP](docs/SEARCH_RESPONSES.md)

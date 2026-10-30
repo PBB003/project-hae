@@ -138,3 +138,28 @@ def test_cli_doctor_and_snapshot_work_against_local_server(live_server, tmp_path
         rows = client.get('/api/projects/p/components?repo_id=frontend', headers=auth_headers).json()
         assert len(rows) == 1 and rows[0]['name'] == 'Card' and rows[0]['complete'] == 1
         assert 'name: string' in rows[0]['contract']
+
+
+def test_streamable_http_transport_and_post_sse(live_server):
+    url, keys = live_server
+    init_payload = {
+        'jsonrpc': '2.0',
+        'id': 1,
+        'method': 'initialize',
+        'params': {
+            'protocolVersion': '2024-11-05',
+            'capabilities': {},
+            'clientInfo': {'name': 'test-client', 'version': '1.0'},
+        },
+    }
+    with httpx.Client(base_url=url) as client:
+        # 1. Probar Streamable HTTP en /mcp
+        resp_mcp = client.post('/mcp', headers={'X-HAE-Key': keys[0].key}, json=init_payload)
+        assert resp_mcp.status_code == 200
+        assert 'HAE-Context-Server' in resp_mcp.text
+
+        # 2. Probar compatibilidad de clientes Streamable HTTP apuntando a /sse con POST
+        resp_sse_post = client.post('/sse', headers={'X-HAE-Key': keys[0].key}, json=init_payload)
+        assert resp_sse_post.status_code == 200
+        assert 'HAE-Context-Server' in resp_sse_post.text
+

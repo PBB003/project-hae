@@ -378,10 +378,12 @@ def main():
 
     if args.command == "youtrack":
         try:
-            from youtrack_sync import sync_youtrack_to_hae
+            from youtrack_sync import sync_youtrack_to_hae, load_youtrack_config
         except ImportError:
-            from client.youtrack_sync import sync_youtrack_to_hae
-        if not sync_youtrack_to_hae(config.get("project", {}).get("id", "project-hae")):
+            from client.youtrack_sync import sync_youtrack_to_hae, load_youtrack_config
+        yt_cfg = load_youtrack_config() or {}
+        pid = yt_cfg.get("hae_project_id") or config.get("project", {}).get("id", "project-hae")
+        if not sync_youtrack_to_hae(pid):
             sys.exit(1)
         return
 
@@ -484,9 +486,12 @@ def main():
     except ImportError:
         from client.youtrack_sync import sync_youtrack_to_hae, load_youtrack_config
     yt_cfg = load_youtrack_config()
-    if yt_cfg and yt_cfg.get("yt_token") and config["project"]["id"] == yt_cfg.get("hae_project_id", "project-hae"):
-        if not sync_youtrack_to_hae(config.get("project", {}).get("id", "project-hae")):
-            sys.exit(1)
+    if yt_cfg and yt_cfg.get("yt_token"):
+        configured_pid = yt_cfg.get("hae_project_id")
+        current_pid = config.get("project", {}).get("id")
+        if current_pid == configured_pid or not configured_pid:
+            if not sync_youtrack_to_hae(current_pid):
+                sys.exit(1)
 
 
 if __name__ == "__main__":

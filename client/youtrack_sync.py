@@ -76,13 +76,14 @@ def issue_to_task(issue, user_id, base_url, fallback_mine=False):
             "resolved_at":issue.get("resolved"),"source_updated_at":issue.get("updated")}
 
 
-def sync_youtrack_to_hae(project_id: str = "project-hae", custom_query: str = None):
+def sync_youtrack_to_hae(project_id: str = None, custom_query: str = None):
     cfg = load_youtrack_config()
     if not cfg or not cfg.get("yt_token"):
         print("[Error] No se encontraron credenciales de YouTrack en ~/.hae.json")
         return False
-    if project_id != cfg.get("hae_project_id", "project-hae"):
-        print("[Error] El proyecto HAE no coincide con el mapeo YouTrack; corrige youtrack.hae_project_id")
+    target_project = project_id or cfg.get("hae_project_id") or "project-hae"
+    if project_id and cfg.get("hae_project_id") and project_id != cfg["hae_project_id"]:
+        print(f"[Error] El proyecto HAE '{project_id}' no coincide con el mapeo YouTrack ('{cfg['hae_project_id']}'); corrige youtrack.hae_project_id")
         return False
     observed_at = datetime.now(timezone.utc).isoformat()
     user_id = cfg.get("user_id")
@@ -123,7 +124,7 @@ def sync_youtrack_to_hae(project_id: str = "project-hae", custom_query: str = No
         return not had_errors
     payload = {"tasks":[issue_to_task(item,user_id,cfg["yt_base_url"],iid in my_ids) for iid,item in all_issues.items()],
                "viewer_id":user_id,"complete":not custom_query and not had_errors,"observed_at":observed_at}
-    endpoint = f"{cfg['server_url'].rstrip('/')}/api/projects/{project_id}/tasks/sync"
+    endpoint = f"{cfg['server_url'].rstrip('/')}/api/projects/{target_project}/tasks/sync"
     req = urllib.request.Request(endpoint,data=json.dumps(payload).encode("utf-8"),method="POST",
         headers={"Content-Type":"application/json","X-HAE-Key":cfg["api_key"]})
     try:
@@ -139,7 +140,7 @@ def sync_youtrack_to_hae(project_id: str = "project-hae", custom_query: str = No
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description="Sincronizador YouTrack -> HAE")
-    parser.add_argument("--project",default="project-hae")
+    parser.add_argument("--project",default=None)
     parser.add_argument("--query",default=None)
     args = parser.parse_args()
     raise SystemExit(0 if sync_youtrack_to_hae(args.project,args.query) else 1)

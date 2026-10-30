@@ -5,6 +5,8 @@ import logging
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.applications import Starlette
+from starlette.routing import Route
 from mcp.server.transport_security import TransportSecuritySettings
 
 from server.api import api_router
@@ -41,8 +43,11 @@ async def lifespan(app: FastAPI):
                 await asyncio.sleep(30)
         worker = asyncio.create_task(retry_webhooks())
     try:
-        yield
+        async with mcp_server.session_manager.run():
+            yield
     finally:
+        if hasattr(mcp_server, "session_manager") and mcp_server.session_manager:
+            mcp_server.session_manager._has_started = False
         if worker:
             worker.cancel()
             try:
@@ -74,12 +79,25 @@ app.include_router(api_router)
 # El SDK de MCP activa por defecto la protección DNS-rebinding solo para localhost,
 # lo que devolvía 421 "Misdirected Request" al conectar por IP pública.
 # Como el acceso está protegido por API key obligatoria, se desactiva esa comprobación de Host.
-app.mount(
-    "/",
-    mcp_server.sse_app(
-        transport_security=TransportSecuritySettings(enable_dns_rebinding_protection=False)
-    ),
+# Se montan tanto Streamable HTTP (/mcp y POST a /sse) como SSE clásico (GET /sse y /messages/).
+streamable_app = mcp_server.streamable_http_app(
+    streamable_http_path="/mcp",
+    transport_security=TransportSecuritySettings(enable_dns_rebinding_protection=False),
 )
+sse_app = mcp_server.sse_app(
+    transport_security=TransportSecuritySettings(enable_dns_rebinding_protection=False),
+)
+streamable_endpoint = streamable_app.routes[0].endpoint
+
+mcp_combined_app = Starlette(
+    routes=[
+        Route("/mcp", endpoint=streamable_endpoint),
+        Route("/sse", endpoint=streamable_endpoint, methods=["POST"]),
+        *sse_app.routes,
+    ]
+)
+
+app.mount("/", mcp_combined_app)
 
 
 def run():

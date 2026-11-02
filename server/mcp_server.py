@@ -170,19 +170,32 @@ async def hae_save_meeting_note(
 
 
 @mcp_server.tool()
-async def hae_get_youtrack_tasks(project_id: str) -> str:
+async def hae_get_youtrack_tasks(
+    project_id: str,
+    query: str | None = None,
+    only_mine: bool = False,
+    limit: int = 30,
+) -> str:
     """
     Obtiene las tareas activas y abiertas de YouTrack asociadas al proyecto.
-    Permite al agente conocer en qué tickets trabajar y sus criterios de aceptación.
+    Permite filtrar por búsqueda (query por ID de ticket como 'TSO-291' o palabras clave),
+    limitar a solo asignadas al usuario (only_mine=True), y ajustar la cantidad (limit).
     """
-    tasks = await TasksService.get_active_tasks(project_id)
+    tasks = await TasksService.get_active_tasks(project_id, limit=limit, only_mine=only_mine, query=query)
     if not tasks:
-        return f"No hay tareas activas de YouTrack registradas para '{project_id}'."
+        msg = f"No hay tareas activas de YouTrack registradas para '{project_id}'"
+        if query:
+            msg += f" que coincidan con '{query}'"
+        return msg + "."
 
-    formatted = [f"Tareas activas de YouTrack para '{project_id}':"]
+    header = f"Tareas activas de YouTrack para '{project_id}'"
+    if query:
+        header += f" (filtro: '{query}')"
+    formatted = [f"{header} ({len(tasks)}):"]
     for t in tasks:
         assignee = f" (Asignado a: {t['assignee']})" if t.get("assignee") else ""
-        formatted.append(f"• [{t['external_id']}] {t['title']} [{t['status']}]{assignee}")
+        mine_badge = " [Asignada a ti]" if t.get("is_mine") else ""
+        formatted.append(f"• [{t['external_id']}] {t['title']} [{t['status']}]{mine_badge}{assignee}")
         if t.get("description"):
             formatted.append(f"  Detalle: {t['description'][:150]}...")
     return "\n".join(formatted)

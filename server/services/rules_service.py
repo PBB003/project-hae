@@ -166,7 +166,7 @@ class RulesService:
                 candidate_symbols = merged[:5]
 
         meeting = await MeetingsService.get_latest_meeting_note(project_id)
-        tasks = await TasksService.get_active_tasks(project_id, 6)
+        tasks = await TasksService.get_active_tasks(project_id, 10)
         rules = await RulesService.get_rules(project_id)
         compact = lambda value, limit=350: (str(value)[:limit] + ("… [consulta detalle]" if len(str(value)) > limit else ""))
         lines = [f"### CONTEXTO DEL PROYECTO: {project['name']} (ID: {project_id})",

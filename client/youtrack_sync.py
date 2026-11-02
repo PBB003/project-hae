@@ -71,7 +71,7 @@ def issue_to_task(issue, user_id, base_url, fallback_mine=False):
     return {"external_id":issue["idReadable"],"title":issue["summary"],"status":status,
             "description":issue.get("description"),"assignee":assignee,
             "url":f"{base_url}/issue/{issue['idReadable']}",
-            "is_mine":user_id in assignee_ids if known_assignment else fallback_mine,
+            "is_mine":(user_id in assignee_ids) or fallback_mine,
             "assignee_ids":assignee_ids,"source_id":issue.get("id"),
             "resolved_at":issue.get("resolved"),"source_updated_at":issue.get("updated")}
 

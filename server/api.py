@@ -165,10 +165,10 @@ async def upsert_task(project_id: str, payload: ProjectTaskCreate):
 
 
 @api_router.get("/projects/{project_id}/tasks")
-async def get_active_tasks(project_id: str, limit: int = Query(10,ge=1,le=100), only_mine: bool = False):
+async def get_active_tasks(project_id: str, limit: int = Query(30,ge=1,le=200), only_mine: bool = False, query: str | None = None):
     if not await RegistryService.get_project(project_id):
         raise HTTPException(status_code=404, detail=f"Proyecto '{project_id}' no encontrado")
-    tasks = await TasksService.get_active_tasks(project_id, limit=limit, only_mine=only_mine)
+    tasks = await TasksService.get_active_tasks(project_id, limit=limit, only_mine=only_mine, query=query)
     return {"project_id": project_id, "active_tasks": tasks}
 
 

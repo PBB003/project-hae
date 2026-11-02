@@ -12,16 +12,17 @@ class TasksService:
             (project_id, task.external_id))).fetchone()
         if old and old["source_updated_at"] is not None and (task.source_updated_at is None or task.source_updated_at < old["source_updated_at"]):
             return old["id"]
+        mine_flag = int(bool(task.is_mine))
         await db.execute("""INSERT INTO project_tasks(project_id,external_id,title,status,description,assignee,url,is_mine,
             resolved_at,source_updated_at,source_id,assignee_ids,archived,updated_at)
             VALUES(?,?,?,?,?,?,?,?,?,?,?,?,0,CURRENT_TIMESTAMP) ON CONFLICT(project_id,external_id) DO UPDATE SET
             title=excluded.title,status=excluded.status,description=excluded.description,assignee=excluded.assignee,
-            url=excluded.url,is_mine=CASE WHEN ?='legacy' THEN excluded.is_mine ELSE project_tasks.is_mine END,
+            url=excluded.url,is_mine=excluded.is_mine,
             resolved_at=excluded.resolved_at,source_updated_at=excluded.source_updated_at,source_id=excluded.source_id,
             assignee_ids=excluded.assignee_ids,archived=0,updated_at=CURRENT_TIMESTAMP""",
             (project_id, task.external_id, task.title, task.status or "Open", task.description, task.assignee, task.url,
-             int(bool(task.is_mine)) if viewer_id == "legacy" else 0, task.resolved_at, task.source_updated_at, task.source_id,
-             json.dumps(task.assignee_ids), viewer_id))
+             mine_flag, task.resolved_at, task.source_updated_at, task.source_id,
+             json.dumps(task.assignee_ids)))
         if task.source_updated_at is not None:
             # Los IDs de usuario HAE configurados para YouTrack deben coincidir
             # con sus IDs en YouTrack. Recalcular todos evita flags obsoletos
@@ -34,9 +35,14 @@ class TasksService:
             for user_id in task.assignee_ids:
                 await db.execute("INSERT INTO task_memberships(project_id,external_id,user_id,is_mine) VALUES(?,?,?,1) ON CONFLICT(project_id,external_id,user_id) DO UPDATE SET is_mine=1",
                     (project_id,task.external_id,user_id))
+        target_mine = int(viewer_id in task.assignee_ids) if (task.source_updated_at is not None and task.assignee_ids) else mine_flag
         await db.execute("""INSERT INTO task_memberships(project_id,external_id,user_id,is_mine) VALUES(?,?,?,?)
             ON CONFLICT(project_id,external_id,user_id) DO UPDATE SET is_mine=excluded.is_mine""",
-            (project_id, task.external_id, viewer_id, int(viewer_id in task.assignee_ids) if task.source_updated_at is not None else int(bool(task.is_mine))))
+            (project_id, task.external_id, viewer_id, target_mine))
+        if viewer_id != "legacy":
+            await db.execute("""INSERT INTO task_memberships(project_id,external_id,user_id,is_mine) VALUES(?,?,?,?)
+                ON CONFLICT(project_id,external_id,user_id) DO UPDATE SET is_mine=excluded.is_mine""",
+                (project_id, task.external_id, "legacy", mine_flag))
         return (await (await db.execute("SELECT id FROM project_tasks WHERE project_id=? AND external_id=?", (project_id, task.external_id))).fetchone())["id"]
 
     @staticmethod
@@ -87,7 +93,7 @@ class TasksService:
         return len(ids)
 
     @staticmethod
-    async def get_active_tasks(project_id, limit=10, only_mine=False, viewer_id=None):
+    async def get_active_tasks(project_id, limit=30, only_mine=False, viewer_id=None, query=None):
         identity = authorize(project_id)
         viewer_id = viewer_id or identity.user_id
         if identity.role != "admin" and viewer_id != identity.user_id:
@@ -96,11 +102,16 @@ class TasksService:
         sql = """SELECT t.*, COALESCE(m.is_mine, CASE WHEN ?='legacy' THEN t.is_mine ELSE 0 END) personal_mine
             FROM project_tasks t LEFT JOIN task_memberships m ON m.project_id=t.project_id AND m.external_id=t.external_id AND m.user_id=?
             WHERE t.project_id=? AND t.archived=0 AND t.resolved_at IS NULL AND t.status NOT IN ('Resolved','Done','Closed')"""
+        params = [viewer_id, viewer_id, project_id]
         if only_mine:
             sql += " AND COALESCE(m.is_mine, CASE WHEN ?='legacy' THEN t.is_mine ELSE 0 END)=1"
-        params = [viewer_id, viewer_id, project_id] + ([viewer_id] if only_mine else [])
-        sql += " ORDER BY personal_mine DESC,t.updated_at DESC,t.external_id LIMIT ?"
-        params.append(max(1,min(int(limit),100)))
+            params.append(viewer_id)
+        if query and query.strip():
+            q = f"%{query.strip()}%"
+            sql += " AND (t.external_id LIKE ? OR t.title LIKE ? OR t.description LIKE ?)"
+            params.extend([q, q, q])
+        sql += " ORDER BY personal_mine DESC, COALESCE(t.source_updated_at, 0) DESC, t.updated_at DESC, t.id DESC LIMIT ?"
+        params.append(max(1, min(int(limit), 200)))
         async with get_db_connection() as db:
             rows = await (await db.execute(sql, params)).fetchall()
             result = []
